@@ -179,7 +179,7 @@ constexpr const ActionKey actions[NUM_ACTION_KEY] = {
 	ActionKey(Keyboard::Key_Equals), // NEXT
 	ActionKey(Keyboard::Key_C), // CROUCHTOGGLE
 	ActionKey(Keyboard::Key_B), // UNEQUIPWEAPON
-	ActionKey(Keyboard::Key_0), // CANCELCURSPELL
+	ActionKey(Keyboard::Key_0, Mouse::Button_2), // CANCELCURSPELL
 	ActionKey(Keyboard::Key_R, Keyboard::Key_M), // MINIMAP
 	ActionKey((Keyboard::Key_LeftAlt << 16) | Keyboard::Key_Enter, (Keyboard::Key_RightAlt << 16) | Keyboard::Key_Enter), // TOGGLE_FULLSCREEN
 	ActionKey(Keyboard::Key_Grave), // CONSOLE
