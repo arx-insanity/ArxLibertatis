@@ -1704,6 +1704,12 @@ public:
 		addControlRow(CONTROLS_CUST_PRECAST1,          "system_menus_options_input_customize_controls_precast1");
 		addControlRow(CONTROLS_CUST_PRECAST2,          "system_menus_options_input_customize_controls_precast2");
 		addControlRow(CONTROLS_CUST_PRECAST3,          "system_menus_options_input_customize_controls_precast3");
+		addControlRow(CONTROLS_CUST_PRECAST4,          "system_menus_options_input_customize_controls_precast4");
+		addControlRow(CONTROLS_CUST_PRECAST5,          "system_menus_options_input_customize_controls_precast5");
+		addControlRow(CONTROLS_CUST_PRECAST6,          "system_menus_options_input_customize_controls_precast6");
+		addControlRow(CONTROLS_CUST_PRECAST7,          "system_menus_options_input_customize_controls_precast7");
+		addControlRow(CONTROLS_CUST_PRECAST8,          "system_menus_options_input_customize_controls_precast8");
+		addControlRow(CONTROLS_CUST_PRECAST9,          "system_menus_options_input_customize_controls_precast9");
 		
 		addControlRow(CONTROLS_CUST_WEAPON,            "system_menus_options_input_customize_controls_weapon");
 		addControlRow(CONTROLS_CUST_UNEQUIPWEAPON,     "system_menus_options_input_customize_controls_unequipweapon");
