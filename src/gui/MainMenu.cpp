@@ -1714,6 +1714,40 @@ public:
 		addControlRow(CONTROLS_CUST_WEAPON,            "system_menus_options_input_customize_controls_weapon");
 		addControlRow(CONTROLS_CUST_UNEQUIPWEAPON,     "system_menus_options_input_customize_controls_unequipweapon");
 		
+		addBackButton(Page_OptionsInputCustomizeKeys1);
+		
+		{
+			TextWidget * txt = new TextWidget(hFontMenu, getLocalised("system_menus_options_input_customize_default"));
+			txt->clicked = [this](Widget * /* widget */) {
+				resetActionKeys();
+			};
+			addCorner(txt, BottomCenter);
+		}
+
+		{
+			ButtonWidget * cb = new ButtonWidget(buttonSize(16, 16), "graph/interface/menus/next");
+			cb->setTargetPage(Page_OptionsInputCustomizeKeys3);
+			addCorner(cb, BottomRight);
+		}
+		
+		reinitActionKeys();
+		
+	}
+	
+};
+
+class ControlOptionsMenuPage3 final : public ControlOptionsPage {
+	
+public:
+	
+	ControlOptionsMenuPage3()
+		: ControlOptionsPage(Page_OptionsInputCustomizeKeys3)
+	{ }
+	
+	void init() override {
+		
+		reserveBottom();
+		
 		addControlRow(CONTROLS_CUST_PREVIOUS,          "system_menus_options_input_customize_controls_previous");
 		addControlRow(CONTROLS_CUST_NEXT,              "system_menus_options_input_customize_controls_next");
 		
@@ -1724,7 +1758,7 @@ public:
 		
 		addControlRow(CONTROLS_CUST_DEBUG,             "system_menus_options_input_customize_controls_debug");
 		
-		addBackButton(Page_OptionsInputCustomizeKeys1);
+		addBackButton(Page_OptionsInputCustomizeKeys2);
 		
 		{
 			TextWidget * txt = new TextWidget(hFontMenu, getLocalised("system_menus_options_input_customize_default"));
@@ -1804,6 +1838,7 @@ void MainMenu::initWindowPages() {
 	m_window->add(new InputOptionsMenuPage());
 	m_window->add(new ControlOptionsMenuPage1());
 	m_window->add(new ControlOptionsMenuPage2());
+	m_window->add(new ControlOptionsMenuPage3());
 	
 	m_window->add(new QuitConfirmMenuPage());
 	m_window->add(new LocalizationMenuPage());
