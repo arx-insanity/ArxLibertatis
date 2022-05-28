@@ -1306,17 +1306,21 @@ void ArxGame::updateFirstPersonCamera() {
 			g_playerCamera.m_pos.x -= distance * angle.x + horizontalOffset * offset.x;
 			g_playerCamera.m_pos.y -= distance * angle.y;
 			g_playerCamera.m_pos.z -= distance * angle.z + horizontalOffset * offset.z;
+
+			EXTERNALVIEW = 1;
 			
 		} else {
 			g_playerCameraStablePos = g_playerCamera.m_pos = player.basePosition();
 		}
 		
 	}
-	
+
+	/*
 	if(EXTERNALVIEW) {
 		g_playerCameraStablePos = g_playerCamera.m_pos = (g_playerCamera.m_pos + targetPos) * 0.5f;
 		g_playerCamera.angle = interpolate(g_playerCamera.angle, targetAngle, 0.1f);
 	}
+	*/
 	
 }
 
