@@ -297,6 +297,134 @@ public:
 	
 };
 
+class PushCommand : public Command {
+public:
+	PushCommand() : Command("push") { }
+
+	Result execute(Context & context) override {
+		std::string value = context.getWord();
+		std::string separator = context.getWord();
+		std::string list = context.getWord();
+
+		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
+			return Failed;
+		}
+
+		if (separator != "to") {
+			ScriptWarning << "expected 'to'";
+			return Failed;
+		}
+
+		if (list.empty()) {
+			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		// TODO
+
+		return Success;
+	}
+};
+
+class PopCommand : public Command {
+public:
+	PopCommand() : Command("pop") { }
+
+	Result execute(Context & context) override {
+		std::string value = context.getWord();
+		std::string separator = context.getWord();
+		std::string list = context.getWord();
+
+		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
+			return Failed;
+		}
+
+		if (separator != "from") {
+			ScriptWarning << "expected 'from'";
+			return Failed;
+		}
+
+		if (list.empty()) {
+			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		// TODO
+
+		return Success;
+	}
+};
+
+class ShiftCommand : public Command {
+public:
+	ShiftCommand() : Command("shift") { }
+
+	Result execute(Context & context) override {
+		std::string value = context.getWord();
+		std::string separator = context.getWord();
+		std::string list = context.getWord();
+
+		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
+			return Failed;
+		}
+
+		if (separator != "from") {
+			ScriptWarning << "expected 'from'";
+			return Failed;
+		}
+
+		if (list.empty()) {
+			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		// TODO
+
+		return Success;
+	}
+};
+
+class UnshiftCommand : public Command {
+public:
+	UnshiftCommand() : Command("unshift") { }
+
+	Result execute(Context & context) override {
+		std::string value = context.getWord();
+		std::string separator = context.getWord();
+		std::string list = context.getWord();
+
+		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
+			return Failed;
+		}
+
+		if (separator != "to") {
+			ScriptWarning << "expected 'to'";
+			return Failed;
+		}
+
+		if (list.empty()) {
+			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		// TODO
+
+		return Success;
+	}
+};
+
 } // anonymous namespace
 
 void setupScriptedVariable() {
@@ -309,7 +437,10 @@ void setupScriptedVariable() {
 	ScriptEvent::registerCommand(std::make_unique<UnsetCommand>());
 	ScriptEvent::registerCommand(std::make_unique<IncrementCommand>("++", 1));
 	ScriptEvent::registerCommand(std::make_unique<IncrementCommand>("--", -1));
-	
+	ScriptEvent::registerCommand(std::make_unique<PushCommand>());
+	ScriptEvent::registerCommand(std::make_unique<PopCommand>());
+	ScriptEvent::registerCommand(std::make_unique<UnshiftCommand>());
+	ScriptEvent::registerCommand(std::make_unique<ShiftCommand>());
 }
 
 } // namespace script
