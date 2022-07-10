@@ -297,24 +297,18 @@ public:
 	
 };
 
-class PushCommand : public Command {
+class PopCommand : public Command {
 public:
-	PushCommand() : Command("push") { }
+	PopCommand() : Command("pop") { }
 
 	Result execute(Context & context) override {
 		std::string value = context.getWord();
-		std::string separator = context.getWord();
 		std::string list = context.getWord();
 
-		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+		DebugScript(' ' << value << ' ' << ' ' << list);
 
 		if (value.empty()) {
 			ScriptWarning << "missing variable name for value";
-			return Failed;
-		}
-
-		if (separator != "to") {
-			ScriptWarning << "expected 'to'";
 			return Failed;
 		}
 
@@ -329,29 +323,23 @@ public:
 	}
 };
 
-class PopCommand : public Command {
+class PushCommand : public Command {
 public:
-	PopCommand() : Command("pop") { }
+	PushCommand() : Command("push") { }
 
 	Result execute(Context & context) override {
-		std::string value = context.getWord();
-		std::string separator = context.getWord();
 		std::string list = context.getWord();
+		std::string value = context.getWord();
 
-		DebugScript(' ' << value << ' ' << separator << ' ' << list);
-
-		if (value.empty()) {
-			ScriptWarning << "missing variable name for value";
-			return Failed;
-		}
-
-		if (separator != "from") {
-			ScriptWarning << "expected 'from'";
-			return Failed;
-		}
+		DebugScript(' ' << list << ' ' << ' ' << value);
 
 		if (list.empty()) {
 			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
 			return Failed;
 		}
 
@@ -366,24 +354,18 @@ public:
 	ShiftCommand() : Command("shift") { }
 
 	Result execute(Context & context) override {
-		std::string value = context.getWord();
-		std::string separator = context.getWord();
 		std::string list = context.getWord();
+		std::string value = context.getWord();
 
-		DebugScript(' ' << value << ' ' << separator << ' ' << list);
-
-		if (value.empty()) {
-			ScriptWarning << "missing variable name for value";
-			return Failed;
-		}
-
-		if (separator != "from") {
-			ScriptWarning << "expected 'from'";
-			return Failed;
-		}
+		DebugScript(' ' << list << ' ' << ' ' << value);
 
 		if (list.empty()) {
 			ScriptWarning << "missing variable name for space separated string";
+			return Failed;
+		}
+
+		if (value.empty()) {
+			ScriptWarning << "missing variable name for value";
 			return Failed;
 		}
 
@@ -399,18 +381,12 @@ public:
 
 	Result execute(Context & context) override {
 		std::string value = context.getWord();
-		std::string separator = context.getWord();
 		std::string list = context.getWord();
 
-		DebugScript(' ' << value << ' ' << separator << ' ' << list);
+		DebugScript(' ' << value << ' ' << ' ' << list);
 
 		if (value.empty()) {
 			ScriptWarning << "missing variable name for value";
-			return Failed;
-		}
-
-		if (separator != "to") {
-			ScriptWarning << "expected 'to'";
 			return Failed;
 		}
 
