@@ -46,6 +46,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <cstring>
 #include <string>
 #include <string_view>
+#include <boost/algorithm/string.hpp>
 
 #include "game/Entity.h"
 #include "graphics/data/Mesh.h"
@@ -302,22 +303,70 @@ public:
 	PopCommand() : Command("pop") { }
 
 	Result execute(Context & context) override {
-		std::string value = context.getWord();
-		std::string list = context.getWord();
+		std::string valueVar = context.getWord();
+		std::string listVar = context.getWord();
 
-		DebugScript(' ' << value << ' ' << ' ' << list);
+		DebugScript(' ' << valueVar << ' ' << ' ' << listVar);
 
-		if (value.empty()) {
+		if (valueVar.empty()) {
 			ScriptWarning << "missing variable name for value";
 			return Failed;
 		}
 
-		if (list.empty()) {
+		if (listVar.empty()) {
 			ScriptWarning << "missing variable name for space separated string";
 			return Failed;
 		}
 
-		// TODO
+		SCRIPT_VARIABLES & valueContext = isLocalVariable(valueVar) ? context.getEntity()->m_variables : svar;
+		SCRIPT_VARIABLES & listContext = isLocalVariable(listVar) ? context.getEntity()->m_variables : svar;
+
+		SCRIPT_VAR * sv = nullptr;
+		std::string list = context.getStringVar(listVar);
+		std::vector<std::string> listValues;
+
+		std::string remainingList = "";
+
+		switch(valueVar[0]) {
+			case '$':
+			case '\xA3': {
+				if (boost::contains(list, " ")) {
+					boost::split(listValues, list + "", boost::is_any_of(" "));
+					sv = SETVarValueText(valueContext, valueVar, listValues[listValues.size() - 1] + "");
+					if (listValues.size() - 1 > 0) {
+						for (size_t i = 0; i < listValues.size() - 1; i++) {
+							if (i > 0) {
+								remainingList += " ";
+							}
+							remainingList += listValues[i];
+						}
+					}
+					SETVarValueText(listContext, listVar, remainingList + "");
+				} else {
+					sv = SETVarValueText(valueContext, valueVar, list + "");
+					SETVarValueText(listContext, listVar, "");
+				}
+				break;
+			}
+			
+			case '#':
+			case '\xA7':
+			case '&':
+			case '@': {
+				ScriptWarning << "Cannot pop value to numeric variables";
+				return Failed;
+			}
+			
+			default: {
+				ScriptWarning << "Unknown variable type: " << valueVar;
+				return Failed;
+			}
+		}
+
+		if(!sv) {
+			ScriptWarning << "Unable to set variable " << valueVar;
+			return Failed;
+		}
 
 		return Success;
 	}
