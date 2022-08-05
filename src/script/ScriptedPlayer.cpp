@@ -155,6 +155,7 @@ public:
 	
 	RuneCommand() : Command("rune") {
 		runes["aam"] = FLAG_AAM;
+		runes["akbaa"] = FLAG_AKBAA;
 		runes["cetrius"] = FLAG_CETRIUS;
 		runes["comunicatum"] = FLAG_COMUNICATUM;
 		runes["cosum"] = FLAG_COSUM;

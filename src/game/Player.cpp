@@ -2405,6 +2405,7 @@ bool ARX_PLAYER_CanStealItem(Entity * item) {
 void ARX_PLAYER_Rune_Add_All() {
 
 	ARX_Player_Rune_Add(FLAG_AAM);
+	ARX_Player_Rune_Add(FLAG_AKBAA);
 	ARX_Player_Rune_Add(FLAG_CETRIUS);
 	ARX_Player_Rune_Add(FLAG_COMUNICATUM);
 	ARX_Player_Rune_Add(FLAG_COSUM);

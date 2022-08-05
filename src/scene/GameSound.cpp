@@ -839,6 +839,7 @@ static void ARX_SOUND_CreateStaticSamples() {
 	
 	// Magic symbols
 	g_snd.SYMB[RUNE_AAM]                 = createEffectSample("magic_aam.wav");
+	g_snd.SYMB[RUNE_AKBAA]               = createEffectSample("akbaa_hail2.wav");
 	g_snd.SYMB[RUNE_CETRIUS]             = createEffectSample("magic_citrius.wav");
 	g_snd.SYMB[RUNE_COSUM]               = createEffectSample("magic_cosum.wav");
 	g_snd.SYMB[RUNE_COMUNICATUM]         = createEffectSample("magic_comunicatum.wav");

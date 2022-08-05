@@ -931,6 +931,7 @@ static int view_player(SaveBlock & save, const char * dat, size_t size) {
 		std::cout << "Runes:";
 		u32 runes = asp.rune_flags;
 		print_flag(runes, FLAG_AAM, "aam");
+		print_flag(runes, FLAG_AKBAA, "akbaa");
 		print_flag(runes, FLAG_CETRIUS, "cetrius");
 		print_flag(runes, FLAG_COMUNICATUM, "comunicatum");
 		print_flag(runes, FLAG_COSUM, "cosum");

@@ -59,6 +59,7 @@ typedef struct RunePattern{
 
 static constexpr const RunePattern patternData[] = {
 	{RUNE_AAM,         CheatRune_AAM,         "6"},
+	{RUNE_AKBAA,       CheatRune_None,        "2672"},
 	{RUNE_CETRIUS,     CheatRune_None,        "386"},
 	{RUNE_COMUNICATUM, CheatRune_COMUNICATUM, "62426"},
 	{RUNE_COSUM,       CheatRune_None,        "6248"},
@@ -950,6 +951,9 @@ void ARX_SPELLS_AnalyseSYMBOL() {
 		case 698:
 		case 68:
 			handleRuneDetection(RUNE_VITAE);
+			break;
+		case 2672:
+			handleRuneDetection(RUNE_AKBAA);
 			break;
 		//-----------------------------------------------
 		// Cheat spells

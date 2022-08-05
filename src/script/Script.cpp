@@ -720,6 +720,8 @@ ValueType getSystemVar(const script::Context & context, std::string_view name,
 				*lcontent = 0;
 				if(temp == "aam") {
 					*lcontent = player.rune_flags & FLAG_AAM;
+				} else if(temp == "akbaa") {
+					*lcontent = player.rune_flags & FLAG_AKBAA;
 				} else if(temp == "cetrius") {
 					*lcontent = player.rune_flags & FLAG_CETRIUS;
 				} else if(temp == "comunicatum") {
