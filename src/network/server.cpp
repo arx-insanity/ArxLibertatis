@@ -1,11 +1,10 @@
-#include<stdio.h>
-#include<string.h> // strlen
-#include<stdlib.h> // strlen
-#include<sys/socket.h>
-#include<arpa/inet.h> // inet_addr, htons
-#include<unistd.h> // write
-
-#include<pthread.h> // for threading, link with lpthread
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include<pthread.h>
 
 #include "core/GameTime.h"
 
@@ -15,11 +14,11 @@ void *connection_handler(void *);
 
 int clients[NUMBER_OF_CONNECTIONS];
 int numberOfClients = 0;
+int serverSocketDescriptor;
 
 void *startServer(void *tmp);
 
 void *startServer(void *tmp) {
-  int socket_desc;
   int new_socket;
   int c;
   void *new_sock;
@@ -28,8 +27,8 @@ void *startServer(void *tmp) {
   char *message;
   
   // Create socket
-  socket_desc = socket(AF_INET, SOCK_STREAM, 0);
-  if (socket_desc == -1) {
+  serverSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+  if (serverSocketDescriptor == -1) {
     printf("Could not create socket");
   }
   
@@ -39,19 +38,19 @@ void *startServer(void *tmp) {
   server.sin_port = htons( 8888 );
   
   // Bind
-  if (bind(socket_desc,(struct sockaddr *)&server, sizeof(server)) < 0) {
+  if (bind(serverSocketDescriptor,(struct sockaddr *)&server, sizeof(server)) < 0) {
     puts("bind failed");
     return NULL;
   }
   puts("bind done");
   
   // Listen
-  listen(socket_desc, NUMBER_OF_CONNECTIONS);
+  listen(serverSocketDescriptor, NUMBER_OF_CONNECTIONS);
   
   // Accept and incoming connection
   puts("Waiting for incoming connections...");
   c = sizeof(struct sockaddr_in);
-  while ((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c))) {
+  while ((new_socket = accept(serverSocketDescriptor, (struct sockaddr *)&client, (socklen_t*)&c))) {
     puts("Connection accepted");
     
     // Reply to the client
@@ -78,6 +77,12 @@ void *startServer(void *tmp) {
   }
   
   return NULL;
+}
+
+void stopServer();
+
+void stopServer() {
+  close(serverSocketDescriptor);
 }
 
 extern PlatformInstant REQUEST_JUMP;
@@ -119,14 +124,14 @@ void __broadcast(int sender, char *message) {
   }
 }
 
-void *connection_handler(void *socket_desc);
+void *connection_handler(void *clientSocketDescriptor);
 
 /*
  * This will handle connection for each client
  * */
-void *connection_handler(void *socket_desc) {
+void *connection_handler(void *clientSocketDescriptor) {
   // Get the socket descriptor
-  int sock = *(int*)socket_desc;
+  int sock = *(int*)clientSocketDescriptor;
   int read_size;
   char *message;
   char client_message[2000];
@@ -166,7 +171,7 @@ void *connection_handler(void *socket_desc) {
   }
 
   // Free the socket pointer
-  free(socket_desc);
+  free(clientSocketDescriptor);
   __disconnect(sock);
 
   return 0;
