@@ -170,7 +170,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
-#include "network/server.cpp"
+#include "network/server.h"
 
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
@@ -933,7 +933,9 @@ void ArxGame::shutdown() {
 		shutdownGame();
 	
 	Application::shutdown();
-	
+
+	stopServer();
+
 	LogInfo << "Clean shutdown";
 }
 

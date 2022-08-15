@@ -976,6 +976,10 @@ set(CORE_SOURCES
 	src/core/Startup.cpp
 )
 
+set(NETWORK_SOURCES
+	src/network/server.cpp
+)
+
 set(GAME_SOURCES
 	src/game/Camera.cpp
 	src/game/Damage.cpp
@@ -1423,6 +1427,7 @@ set(ARX_SOURCES
 	${CINEMATIC_SOURCES}
 	${AUDIO_SOURCES}
 	${CORE_SOURCES}
+	${NETWORK_SOURCES}
 	${GAME_SOURCES}
 	${GRAPHICS_SOURCES}
 	${GUI_SOURCES}

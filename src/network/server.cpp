@@ -1,24 +1,14 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include<pthread.h>
-
-#include "core/GameTime.h"
+#include "network/server.h"
 
 #define NUMBER_OF_CONNECTIONS 3
 
-void *connection_handler(void *);
+extern PlatformInstant REQUEST_JUMP;
 
 int clients[NUMBER_OF_CONNECTIONS];
 int numberOfClients = 0;
 int serverSocketDescriptor;
 
-void *startServer(void *tmp);
-
-void *startServer(void *tmp) {
+void *startServer(void *) {
   int new_socket;
   int c;
   void *new_sock;
@@ -79,15 +69,10 @@ void *startServer(void *tmp) {
   return NULL;
 }
 
-void stopServer();
-
 void stopServer() {
+  puts("Stopping server");
   close(serverSocketDescriptor);
 }
-
-extern PlatformInstant REQUEST_JUMP;
-
-void __connect(int clientId);
 
 void __connect(int clientId) {
   clients[numberOfClients] = clientId;
@@ -96,15 +81,11 @@ void __connect(int clientId) {
   // TODO: broadcast the connection of new client
 }
 
-void __disconnect(int clientId);
-
 void __disconnect(int clientId) {
   printf("client #%d disconnected!\n", clientId);
   // TODO: remove sock from clients
   // TODO: broadcast the disconnection of client
 }
-
-void __broadcast(int sender, char *message);
 
 void __broadcast(int sender, char *message) {
   char messageToBroadcast[3000];
@@ -124,11 +105,6 @@ void __broadcast(int sender, char *message) {
   }
 }
 
-void *connection_handler(void *clientSocketDescriptor);
-
-/*
- * This will handle connection for each client
- * */
 void *connection_handler(void *clientSocketDescriptor) {
   // Get the socket descriptor
   int sock = *(int*)clientSocketDescriptor;
