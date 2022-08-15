@@ -77,7 +77,7 @@ void stopServer() {
 void __broadcast(int sender, std::string message) {
   char messageToBroadcast[3000];
 
-  int size = sprintf(messageToBroadcast, "client #%d: %s\n", sender, message);
+  int size = sprintf(messageToBroadcast, "client #%d: %s\n", sender, message.c_str());
 
   if (message == "jump") {
     REQUEST_JUMP = g_platformTime.frameStart();
@@ -96,21 +96,18 @@ void __connect(int clientId) {
   clients[numberOfClients] = clientId;
   numberOfClients += 1;
 
-  char message[200];
-  sprintf(message, "client #%d joined the server", clientId);
-  __broadcast(clientId, message);
+  __broadcast(clientId, "joined the server");
 }
 
 void __disconnect(int clientId) {
-  printf("client #%d disconnected!\n", clientId);
   // TODO: remove sock from clients
-  // TODO: broadcast the disconnection of client
+
+  __broadcast(clientId, "disconnected from the server");
 }
 
 void *connection_handler(void *clientSocketDescriptor) {
   // Get the socket descriptor
   int sock = *(int*)clientSocketDescriptor;
-  int read_size;
   char *message;
   char client_message[2000];
 
@@ -125,31 +122,30 @@ void *connection_handler(void *clientSocketDescriptor) {
 
   int raw_read_size = 0;
 
-  // Receive a message from client
-  do {
-    raw_read_size = recv(sock, client_message, 2000, 0);
+  bool clientWantsToQuit = false;
 
-    /*
-    // trimming newline chars
-    read_size = raw_read_size;
-    if (read_size > 0 && client_message[read_size - 2] == 13 && client_message[read_size - 1] == 10) {
-      client_message[read_size - 2] = 0;
-      read_size -= 2;
-    }
-    */
+  do {
+    // Receive a message from client
+    raw_read_size = recv(sock, client_message, 2000, 0);
 
     std::string messageAsString(client_message, raw_read_size);
     boost::trim(messageAsString);
-    read_size = messageAsString.length();
 
-    if (read_size > 0) {
+    if (messageAsString == "exit" || messageAsString == "quit") {
+      clientWantsToQuit = true;
+      std::string goodbyeMessage = "Goodbye!\n";
+      write(sock, goodbyeMessage.c_str(), goodbyeMessage.length());
+    }
+
+    if (!messageAsString.empty() && !clientWantsToQuit) {
       __broadcast(sock, messageAsString);
     }
-  } while (raw_read_size > 0);
+  } while (raw_read_size > 0 && !clientWantsToQuit);
   
-  if (read_size == 0) {
+  if (raw_read_size == 0 || clientWantsToQuit) {
+    // TODO: can we tell TELNET to quit?
     fflush(stdout);
-  } else if (read_size == -1) {
+  } else if (raw_read_size == -1) {
     perror("recv failed");
   }
 
