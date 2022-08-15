@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <boost/algorithm/string/trim.hpp>
+
 #include "core/GameTime.h"
 
 void *startServer(void *);
@@ -19,7 +21,7 @@ void __connect(int clientId);
 
 void __disconnect(int clientId);
 
-void __broadcast(int sender, char *message);
+void __broadcast(int sender, std::string message);
 
 void *connection_handler(void *clientSocketDescriptor);
 

@@ -74,25 +74,12 @@ void stopServer() {
   close(serverSocketDescriptor);
 }
 
-void __connect(int clientId) {
-  clients[numberOfClients] = clientId;
-  numberOfClients += 1;
-  printf("client #%d connected!\n", clientId);
-  // TODO: broadcast the connection of new client
-}
-
-void __disconnect(int clientId) {
-  printf("client #%d disconnected!\n", clientId);
-  // TODO: remove sock from clients
-  // TODO: broadcast the disconnection of client
-}
-
-void __broadcast(int sender, char *message) {
+void __broadcast(int sender, std::string message) {
   char messageToBroadcast[3000];
 
   int size = sprintf(messageToBroadcast, "client #%d: %s\n", sender, message);
 
-  if (memcmp(message, "jump", 4) == 0) {
+  if (message == "jump") {
     REQUEST_JUMP = g_platformTime.frameStart();
   }
 
@@ -103,6 +90,21 @@ void __broadcast(int sender, char *message) {
       write(clients[i], messageToBroadcast, size);
     }
   }
+}
+
+void __connect(int clientId) {
+  clients[numberOfClients] = clientId;
+  numberOfClients += 1;
+
+  char message[200];
+  sprintf(message, "client #%d joined the server", clientId);
+  __broadcast(clientId, message);
+}
+
+void __disconnect(int clientId) {
+  printf("client #%d disconnected!\n", clientId);
+  // TODO: remove sock from clients
+  // TODO: broadcast the disconnection of client
 }
 
 void *connection_handler(void *clientSocketDescriptor) {
@@ -125,18 +127,23 @@ void *connection_handler(void *clientSocketDescriptor) {
 
   // Receive a message from client
   do {
-    read_size = recv(sock, client_message, 2000, 0);
-    raw_read_size = read_size;
+    raw_read_size = recv(sock, client_message, 2000, 0);
 
-
+    /*
     // trimming newline chars
+    read_size = raw_read_size;
     if (read_size > 0 && client_message[read_size - 2] == 13 && client_message[read_size - 1] == 10) {
       client_message[read_size - 2] = 0;
       read_size -= 2;
     }
+    */
+
+    std::string messageAsString(client_message, raw_read_size);
+    boost::trim(messageAsString);
+    read_size = messageAsString.length();
 
     if (read_size > 0) {
-      __broadcast(sock, client_message);
+      __broadcast(sock, messageAsString);
     }
   } while (raw_read_size > 0);
   
