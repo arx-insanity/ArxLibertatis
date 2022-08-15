@@ -170,7 +170,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
-#include "gui/Network.cpp"
+#include "network/server.cpp"
 
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
