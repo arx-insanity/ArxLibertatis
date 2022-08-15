@@ -170,6 +170,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
+#include "gui/Network.cpp"
+
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
 #endif
@@ -249,6 +251,9 @@ bool ArxGame::initialize() {
 		LogCritical << "Failed to initialize game";
 		return false;
 	}
+
+	pthread_t sniffer_thread;
+	pthread_create( &sniffer_thread, NULL,  startServer, NULL);
 	
 	return true;
 }

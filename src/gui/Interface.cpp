@@ -131,7 +131,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
-
 extern EERIE_3DOBJ * arrowobj;
 
 extern AnimationDuration PLAYER_ROTATION;
