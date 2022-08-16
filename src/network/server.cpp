@@ -1,7 +1,7 @@
 #include "network/server.h"
 
 #define NUMBER_OF_CONNECTIONS 3
-#define LOGPREFIX "Network: "
+#define LOGPREFIX "Arx Server: "
 
 extern PlatformInstant REQUEST_JUMP;
 
@@ -20,6 +20,7 @@ int findIndex(const std::vector<int> &arr, int item) {
 }
 
 void *startServer(void *) {
+  unsigned int port = 8888; // TODO: get this from function parameter
   int new_socket;
   int c;
   void *new_sock;
@@ -37,7 +38,7 @@ void *startServer(void *) {
   // Prepare the sockaddr_in structure
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(8888);
+  server.sin_port = htons(port);
   
   int resultOfBinding = bind(serverSocketDescriptor, (struct sockaddr *)&server, sizeof(server));
   if (resultOfBinding < 0) {
@@ -45,7 +46,7 @@ void *startServer(void *) {
     return nullptr;
   }
 
-  LogInfo << LOGPREFIX << "binding done";
+  LogInfo << LOGPREFIX << "binding done, created server at port " << port;
 
   listen(serverSocketDescriptor, NUMBER_OF_CONNECTIONS);
 
