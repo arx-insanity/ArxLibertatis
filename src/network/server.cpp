@@ -19,8 +19,8 @@ int findIndex(const std::vector<int> &arr, int item) {
   return -1;
 }
 
-void *startServer(void *) {
-  unsigned int port = 8888; // TODO: get this from function parameter
+void *startServer(void *portArg) {
+  unsigned int port = *(unsigned int*)portArg;
   int new_socket;
   int c;
   void *new_sock;

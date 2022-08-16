@@ -15,7 +15,7 @@
 #include "io/log/Logger.h"
 #include "core/GameTime.h"
 
-void *startServer(void *);
+void *startServer(void *portArg);
 
 void stopServer();
 

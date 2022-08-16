@@ -582,14 +582,23 @@ static void loadSave(const std::string & saveFile) {
 }
 ARX_PROGRAM_OPTION_ARG("loadsave", "", "Load a specific savegame file", &loadSave, "SAVEFILE")
 
-static void startAsServer(const std::string & port) {
-	// TODO: parse port and send it to startServer()
+static void startAsServer(const std::string & rawPort) {
+	long port = strtol(rawPort.c_str(), nullptr, 10);
+
+	if (port < 1000 && port > 65536) {
+		LogError << "Invalid value for --server, expected an integer between 1000 and 65536, got '" << rawPort << "'";
+		return;
+	}
+
+	void *portArg = malloc(1);
+	*(unsigned int*)portArg = port;
+
 	pthread_t sniffer_thread;
-	pthread_create( &sniffer_thread, NULL,  startServer, NULL);
+	pthread_create( &sniffer_thread, NULL,  startServer, portArg);
 }
 ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
 
-static void startAsClient(const std::string & target) {
+static void startAsClient(const std::string & rawTarget) {
 	// TODO: parse target as ip + ":" + port
 	// TODO: start client and connect to the server
 }
