@@ -10,10 +10,13 @@
 #include <pthread.h>
 
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/erase.hpp>
 #include <vector>
 
 #include "io/log/Logger.h"
 #include "core/GameTime.h"
+#include "gui/Notification.h"
 
 void *startServer(void *portArg);
 

@@ -93,8 +93,16 @@ void __broadcast(int sender, std::string message) {
 
   int size = sprintf(messageToBroadcast, "client #%d: %s\n", sender, message.c_str());
 
-  if (message == "jump") {
-    REQUEST_JUMP = g_platformTime.frameStart();
+  // if (message == "jump") {
+  //   // make the player jump
+  //   REQUEST_JUMP = g_platformTime.frameStart();
+  // }
+
+  if (boost::starts_with(message, "say:")) {
+    std::string text = boost::trim_copy(boost::erase_head_copy(message, 4));
+    if (text != "") {
+      notification_add(std::string("client #" + std::to_string(sender) + ": " + text));
+    }
   }
 
   LogInfo << LOGPREFIX << "client #" << sender << ": " << message;
