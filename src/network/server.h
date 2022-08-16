@@ -30,4 +30,8 @@ void __broadcast(int sender, std::string message);
 
 void *connection_handler(void *clientSocketDescriptor);
 
+struct clientData {
+  int clientId;
+};
+
 #endif // ARX_NETWORK_SERVER_H

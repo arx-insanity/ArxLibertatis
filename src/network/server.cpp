@@ -5,15 +5,19 @@
 
 extern PlatformInstant REQUEST_JUMP;
 
-std::vector<int> clients;
+std::vector<clientData> clients;
 
 int serverSocketDescriptor;
 
-int findIndex(const std::vector<int> &arr, int item) {
-  auto ret = std::find(arr.begin(), arr.end(), item);
+int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
+  if (clients.empty()) {
+    return -1;
+  }
 
-  if (ret != arr.end()) {
-    return ret - arr.begin();
+  for (int i = 0; i < clients.size(); i++) {
+    if (clients[i].clientId == clientId) {
+      return i;
+    }
   }
 
   return -1;
@@ -108,20 +112,23 @@ void __broadcast(int sender, std::string message) {
   LogInfo << LOGPREFIX << "client #" << sender << ": " << message;
 
   for (char i = 0; i < clients.size(); i++) {
-    if (clients[i] != sender) {
-      write(clients[i], messageToBroadcast, size);
+    if (clients[i].clientId != sender) {
+      write(clients[i].clientId, messageToBroadcast, size);
     }
   }
 }
 
 void __connect(int clientId) {
-  clients.push_back(clientId);
+  struct clientData client;
+  client.clientId = clientId;
+
+  clients.push_back(client);
 
   __broadcast(clientId, "joined the server");
 }
 
 void __disconnect(int clientId) {
-  int idx = findIndex(clients, clientId);
+  int idx = findClientIndexById(clients, clientId);
   if (idx != -1) {
     clients.erase(clients.begin() + idx);
     __broadcast(clientId, "disconnected from the server");
