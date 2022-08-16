@@ -582,12 +582,18 @@ static void loadSave(const std::string & saveFile) {
 }
 ARX_PROGRAM_OPTION_ARG("loadsave", "", "Load a specific savegame file", &loadSave, "SAVEFILE")
 
-static void startAsServer() {
+static void startAsServer(const std::string & port) {
+	// TODO: parse port and send it to startServer()
 	pthread_t sniffer_thread;
 	pthread_create( &sniffer_thread, NULL,  startServer, NULL);
 }
-// TODO: read the value as port number
-ARX_PROGRAM_OPTION("server", "", "Start the game as server", &startAsServer)
+ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
+
+static void startAsClient(const std::string & target) {
+	// TODO: parse target as ip + ":" + port
+	// TODO: start client and connect to the server
+}
+ARX_PROGRAM_OPTION_ARG("connect", "", "Join a server at the given address", &startAsClient, "IP:PORT")
 
 static bool HandleGameFlowTransitions() {
 	
