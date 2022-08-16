@@ -124,25 +124,19 @@ void __broadcast(int sender, std::string message) {
   struct clientData * client = findClientById(sender);
   // TODO: in the future sender might be the server, compare it with self
 
-  std::string command;
+  if (boost::starts_with(message, "/")) {
+    std::string::size_type commandSize = message.find(" ", 0);
+    std::string command = message.substr(1, commandSize - 1);
+    std::string text = boost::trim_copy(boost::erase_head_copy(message, commandSize));
 
-  // TODO: check if message has the pattern of /[a-z]+:/ and if so,
-  // then do if/elses for the command part before :
-  command = "say";
-  if (boost::starts_with(message, command + ":")) {
-    std::string text = boost::trim_copy(boost::erase_head_copy(message, command.size() + 1));
-    if (text != "") {
-      if (self.clientId != sender) {
+    if (command == "say") {
+      if (!text.empty()) {
         notification_add(std::string((*client).nickname + ": " + text));
       }
-    }
-  }
-
-  command = "nickname";
-  if (boost::starts_with(message, command + ":")) {
-    std::string text = boost::trim_copy(boost::erase_head_copy(message, command.size() + 1));
-    if (text != "") {
-      (*client).nickname = text;
+    } else if (command == "nickname") {
+      if (!text.empty()) {
+        (*client).nickname = text;
+      }
     }
   }
 
@@ -193,7 +187,7 @@ void *connection_handler(void *clientSocketDescriptor) {
     std::string messageAsString(client_message, raw_read_size);
     boost::trim(messageAsString);
 
-    if (messageAsString == "exit" || messageAsString == "quit") {
+    if (messageAsString == "/exit" || messageAsString == "/quit") {
       std::string goodbyeMessage = "Arx Server: Disconnected, goodbye!\n";
       write(clientId, goodbyeMessage.c_str(), goodbyeMessage.size());
       clientWantsToQuit = true;
