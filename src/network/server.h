@@ -17,6 +17,7 @@
 #include "io/log/Logger.h"
 #include "core/GameTime.h"
 #include "gui/Notification.h"
+#include "game/Entity.h"
 
 void *startServer(void *portArg);
 
@@ -32,6 +33,8 @@ void *connection_handler(void *clientSocketDescriptor);
 
 struct clientData {
   int clientId;
+  std::string nickname;
+  Entity * entity;
 };
 
 #endif // ARX_NETWORK_SERVER_H

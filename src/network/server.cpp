@@ -23,6 +23,20 @@ int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
   return -1;
 }
 
+clientData *findClientById(int clientId) {
+  if (clients.empty()) {
+    return nullptr;
+  }
+
+  for (int i = 0; i < clients.size(); i++) {
+    if (clients[i].clientId == clientId) {
+      return &clients[i];
+    }
+  }
+
+  return nullptr;
+}
+
 void *startServer(void *portArg) {
   unsigned int port = *(unsigned int*)portArg;
   int new_socket;
@@ -102,10 +116,12 @@ void __broadcast(int sender, std::string message) {
   //   REQUEST_JUMP = g_platformTime.frameStart();
   // }
 
+  struct clientData client = *findClientById(sender);
+
   if (boost::starts_with(message, "say:")) {
     std::string text = boost::trim_copy(boost::erase_head_copy(message, 4));
     if (text != "") {
-      notification_add(std::string("client #" + std::to_string(sender) + ": " + text));
+      notification_add(std::string(client.nickname + ": " + text));
     }
   }
 
@@ -121,6 +137,7 @@ void __broadcast(int sender, std::string message) {
 void __connect(int clientId) {
   struct clientData client;
   client.clientId = clientId;
+  client.nickname = "client #" + std::to_string(clientId);
 
   clients.push_back(client);
 
@@ -130,8 +147,8 @@ void __connect(int clientId) {
 void __disconnect(int clientId) {
   int idx = findClientIndexById(clients, clientId);
   if (idx != -1) {
-    clients.erase(clients.begin() + idx);
     __broadcast(clientId, "disconnected from the server");
+    clients.erase(clients.begin() + idx);
   }
 }
 
