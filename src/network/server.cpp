@@ -7,6 +7,8 @@ extern PlatformInstant REQUEST_JUMP;
 
 std::vector<clientData> clients;
 
+struct clientData self;
+
 int serverSocketDescriptor;
 
 int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
@@ -45,6 +47,9 @@ void *startServer(void *portArg) {
   struct sockaddr_in server;
   struct sockaddr_in client;
   char *message;
+
+  self.clientId = 'server';
+  self.nickname = 'Server';
   
   // Create socket
   serverSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
@@ -116,12 +121,28 @@ void __broadcast(int sender, std::string message) {
   //   REQUEST_JUMP = g_platformTime.frameStart();
   // }
 
-  struct clientData client = *findClientById(sender);
+  struct clientData * client = findClientById(sender);
+  // TODO: in the future sender might be the server, compare it with self
 
-  if (boost::starts_with(message, "say:")) {
-    std::string text = boost::trim_copy(boost::erase_head_copy(message, 4));
+  std::string command;
+
+  // TODO: check if message has the pattern of /[a-z]+:/ and if so,
+  // then do if/elses for the command part before :
+  command = "say";
+  if (boost::starts_with(message, command + ":")) {
+    std::string text = boost::trim_copy(boost::erase_head_copy(message, command.size() + 1));
     if (text != "") {
-      notification_add(std::string(client.nickname + ": " + text));
+      if (self.clientId != sender) {
+        notification_add(std::string((*client).nickname + ": " + text));
+      }
+    }
+  }
+
+  command = "nickname";
+  if (boost::starts_with(message, command + ":")) {
+    std::string text = boost::trim_copy(boost::erase_head_copy(message, command.size() + 1));
+    if (text != "") {
+      (*client).nickname = text;
     }
   }
 
