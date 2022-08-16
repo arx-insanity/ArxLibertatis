@@ -10,6 +10,7 @@
 #include <pthread.h>
 
 #include <boost/algorithm/string/trim.hpp>
+#include <vector>
 
 #include "core/GameTime.h"
 

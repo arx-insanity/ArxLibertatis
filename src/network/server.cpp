@@ -4,9 +4,19 @@
 
 extern PlatformInstant REQUEST_JUMP;
 
-int clients[NUMBER_OF_CONNECTIONS];
-int numberOfClients = 0;
+std::vector<int> clients;
+
 int serverSocketDescriptor;
+
+int findIndex(const std::vector<int> &arr, int item) {
+  auto ret = std::find(arr.begin(), arr.end(), item);
+
+  if (ret != arr.end()) {
+    return ret - arr.begin();
+  }
+
+  return -1;
+}
 
 void *startServer(void *) {
   int new_socket;
@@ -65,7 +75,7 @@ void *startServer(void *) {
     perror("accept failed");
     return NULL;
   }
-  
+
   return NULL;
 }
 
@@ -85,7 +95,7 @@ void __broadcast(int sender, std::string message) {
 
   printf("%s", messageToBroadcast);
 
-  for (char i = 0; i < numberOfClients; i++) {
+  for (char i = 0; i < clients.size(); i++) {
     if (clients[i] != sender) {
       write(clients[i], messageToBroadcast, size);
     }
@@ -93,16 +103,17 @@ void __broadcast(int sender, std::string message) {
 }
 
 void __connect(int clientId) {
-  clients[numberOfClients] = clientId;
-  numberOfClients += 1;
+  clients.push_back(clientId);
 
   __broadcast(clientId, "joined the server");
 }
 
 void __disconnect(int clientId) {
-  // TODO: remove sock from clients
-
-  __broadcast(clientId, "disconnected from the server");
+  int idx = findIndex(clients, clientId);
+  if (idx != -1) {
+    clients.erase(clients.begin() + idx);
+    __broadcast(clientId, "disconnected from the server");
+  }
 }
 
 void *connection_handler(void *clientSocketDescriptor) {
@@ -134,7 +145,7 @@ void *connection_handler(void *clientSocketDescriptor) {
     if (messageAsString == "exit" || messageAsString == "quit") {
       clientWantsToQuit = true;
       std::string goodbyeMessage = "Goodbye!\n";
-      write(sock, goodbyeMessage.c_str(), goodbyeMessage.length());
+      write(sock, goodbyeMessage.c_str(), goodbyeMessage.size());
     }
 
     if (!messageAsString.empty() && !clientWantsToQuit) {
