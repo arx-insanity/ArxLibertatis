@@ -977,7 +977,8 @@ set(CORE_SOURCES
 )
 
 set(NETWORK_SOURCES
-	src/network/server.cpp
+	src/network/Client.cpp
+	src/network/Server.cpp
 )
 
 set(GAME_SOURCES

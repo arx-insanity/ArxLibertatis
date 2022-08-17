@@ -170,7 +170,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
-#include "network/server.h"
+#include "network/Server.h"
+#include "network/Client.h"
 
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
@@ -184,6 +185,8 @@ InfoPanels g_debugInfo = InfoPanelNone;
 extern bool START_NEW_QUEST;
 SavegameHandle LOADQUEST_SLOT = SavegameHandle(); // OH NO, ANOTHER GLOBAL! - TEMP PATCH TO CLEAN CODE FLOW
 static fs::path g_saveToLoad;
+
+static Server g_server;
 
 static const PlatformDuration runeDrawPointInterval = 16ms; // ~60fps
 
@@ -585,16 +588,12 @@ ARX_PROGRAM_OPTION_ARG("loadsave", "", "Load a specific savegame file", &loadSav
 static void startAsServer(const std::string & rawPort) {
 	long port = strtol(rawPort.c_str(), nullptr, 10);
 
-	if (port < 1000 && port > 65536) {
+	if (port < 1000 || port > 65536) {
 		LogError << "Invalid value for --server, expected an integer between 1000 and 65536, got '" << rawPort << "'";
 		return;
 	}
 
-	void *portArg = malloc(1);
-	*(unsigned int*)portArg = port;
-
-	pthread_t sniffer_thread;
-	pthread_create( &sniffer_thread, NULL,  startServer, portArg);
+	g_server.start(port);
 }
 ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
 
@@ -953,7 +952,7 @@ void ArxGame::shutdown() {
 	
 	Application::shutdown();
 
-	stopServer();
+	g_server.stop();
 
 	LogInfo << "Clean shutdown";
 }

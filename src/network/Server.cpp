@@ -1,15 +1,124 @@
-#include "network/server.h"
+#include "network/Server.h"
 
-#define NUMBER_OF_CONNECTIONS 3
 #define LOGPREFIX "Arx Server: "
 
+Server::Server() {
+  this->m_isRunning = false;
+}
+
+std::thread thread;
+
+void Server::start(int port) {
+  if (this->m_isRunning) {
+    LogError << LOGPREFIX << "server already started";
+    return;
+  }
+
+  LogInfo << LOGPREFIX << "server starting...";
+
+  this->m_port = port;
+
+  std::function<void(void)> fn = std::bind(&Server::serverThread, this);
+
+  thread = std::thread(fn);
+}
+
+void Server::stop() {
+  if (!this->m_isRunning) {
+    LogError << LOGPREFIX << "server not running";
+    return;
+  }
+
+  LogInfo << LOGPREFIX << "stopping server...";
+
+  this->m_isRunning = false;
+  shutdown(this->m_socketDescriptor, SHUT_RD);
+  close(this->m_socketDescriptor);
+  thread.join();
+
+  LogInfo << LOGPREFIX << "server stopped";
+}
+
+clientInfo * Server::findClientByDescriptor(int descriptor) {
+  if (this->m_clients.empty()) {
+    return nullptr;
+  }
+
+  for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+    if (this->m_clients[i].descriptor == descriptor) {
+      return &this->m_clients[i];
+    }
+  }
+
+  return nullptr;
+}
+
+void Server::serverThread() {
+  this->m_isRunning = true;
+
+  this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+  if (this->m_socketDescriptor == -1) {
+    LogError << LOGPREFIX << "could not create socket";
+    return;
+  }
+
+  struct sockaddr_in server;
+  server.sin_family = AF_INET;
+  server.sin_addr.s_addr = INADDR_ANY;
+  server.sin_port = htons(this->m_port);
+
+  int resultOfBinding = bind(this->m_socketDescriptor, (struct sockaddr *)&server, sizeof(server));
+  if (resultOfBinding < 0) {
+    LogError << LOGPREFIX << "bind failed";
+    return;
+  }
+
+  listen(this->m_socketDescriptor, 3);
+
+  LogInfo << LOGPREFIX << "server started at port " << std::to_string(this->m_port);
+
+  socklen_t c = sizeof(struct sockaddr_in);
+
+  struct sockaddr_in client;
+  int clientDescriptor;
+
+  while ((clientDescriptor = accept(this->m_socketDescriptor, (struct sockaddr *)&client, &c)) > 0) {
+    LogInfo << LOGPREFIX << "connection accepted";
+
+    // TODO: create thread for client
+
+    // pthread_t sniffer_thread;
+    // void *new_sock;
+    // new_sock = malloc(1);
+    // *(int*)new_sock = new_socket;
+    
+    // if (pthread_create( &sniffer_thread, NULL,  connection_handler, new_sock) < 0) {
+    //   LogError << LOGPREFIX << "Could not create thread for the connection handler";
+    //   return;
+    // }
+  }
+
+  if (clientDescriptor < 0 && this->m_isRunning) {
+    LogError << LOGPREFIX << "accepting connections failed";
+    return;
+  }
+
+  /*
+    message = "Arx Server: Connected\n";
+    write(new_socket, message, strlen(message));
+
+    message = "Arx Server: Assigning handler...\n";
+    write(new_socket, message, strlen(message));
+
+    LogInfo << LOGPREFIX << "Connection handler assigned to client";
+  }
+  */
+}
+
+/*
 extern PlatformInstant REQUEST_JUMP;
 
 std::vector<clientData> clients;
-
-struct clientData self;
-
-int serverSocketDescriptor;
 
 int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
   if (clients.empty()) {
@@ -23,20 +132,6 @@ int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
   }
 
   return -1;
-}
-
-clientData *findClientById(int clientId) {
-  if (clients.empty()) {
-    return nullptr;
-  }
-
-  for (int i = 0; i < clients.size(); i++) {
-    if (clients[i].clientId == clientId) {
-      return &clients[i];
-    }
-  }
-
-  return nullptr;
 }
 
 void *startServer(void *portArg) {
@@ -62,12 +157,6 @@ void *startServer(void *portArg) {
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons(port);
-  
-  int resultOfBinding = bind(serverSocketDescriptor, (struct sockaddr *)&server, sizeof(server));
-  if (resultOfBinding < 0) {
-    LogError << LOGPREFIX << "bind failed";
-    return nullptr;
-  }
 
   LogInfo << LOGPREFIX << "binding done, created server at port " << port;
 
@@ -211,3 +300,4 @@ void *connection_handler(void *clientSocketDescriptor) {
 
   return 0;
 }
+*/
