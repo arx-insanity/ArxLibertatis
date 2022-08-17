@@ -2,11 +2,12 @@
 
 #define LOGPREFIX "Arx Server: "
 
+// TODO: make this a member of the Server class
+std::thread m_thread;
+
 Server::Server() {
   this->m_isRunning = false;
 }
-
-std::thread thread;
 
 void Server::start(int port) {
   if (this->m_isRunning) {
@@ -20,7 +21,7 @@ void Server::start(int port) {
 
   std::function<void(void)> fn = std::bind(&Server::serverThread, this);
 
-  thread = std::thread(fn);
+  m_thread = std::thread(fn);
 }
 
 void Server::stop() {
@@ -34,7 +35,7 @@ void Server::stop() {
   this->m_isRunning = false;
   shutdown(this->m_socketDescriptor, SHUT_RD);
   close(this->m_socketDescriptor);
-  thread.join();
+  m_thread.join();
 
   LogInfo << LOGPREFIX << "server stopped";
 }
