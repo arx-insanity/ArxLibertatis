@@ -1,7 +1,9 @@
 #ifndef ARX_NETWORK_SERVER_H
 #define ARX_NETWORK_SERVER_H
 
+#include <thread>
 #include <vector>
+#include "network/ClientData.h"
 
 /*
 #include <boost/algorithm/string/trim.hpp>
@@ -12,21 +14,12 @@
 #include "gui/Notification.h"
 */
 
-#include "network/ClientData.h"
-// #include "network/Client.h"
-
 /*
-void *startServer(void *portArg);
-
-void stopServer();
-
 void __connect(int clientId);
 
 void __disconnect(int clientId);
 
 void __broadcast(int sender, std::string message);
-
-void *connection_handler(void *clientSocketDescriptor);
 */
 
 class Server {
@@ -44,6 +37,7 @@ class Server {
     int m_socketDescriptor;
 
     std::vector<ClientData *> m_clients;
+    std::thread * m_thread;
 };
 
 #endif // ARX_NETWORK_SERVER_H

@@ -3,8 +3,6 @@
 #include "network/common.h"
 #include "network/ClientData.h"
 
-std::thread m_client_thread;
-
 ClientData::ClientData(int descriptor) {
   this->m_descriptor = descriptor;
   this->m_nickname = "client #" + descriptor;
@@ -20,12 +18,11 @@ void ClientData::write(std::string message) {
 }
 
 void ClientData::listen() {
-  std::function<void(void)> fn = std::bind(&ClientData::connectionHandler, this);
-  m_client_thread = std::thread(fn);
+  this->m_thread = new std::thread(&ClientData::connectionHandler, this);
 }
 
 void ClientData::stopListening() {
-  m_client_thread.join();
+  this->m_thread->join();
 }
 
 void ClientData::connectionHandler() {

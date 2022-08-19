@@ -1,12 +1,8 @@
-#include <thread>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/Server.h"
-
-// TODO: make this a member of the Server class
-std::thread m_thread;
 
 Server::Server() {
   this->m_isRunning = false;
@@ -22,8 +18,7 @@ void Server::start(int port) {
 
   this->m_port = port;
 
-  std::function<void(void)> fn = std::bind(&Server::connectionHandler, this);
-  m_thread = std::thread(fn);
+  this->m_thread = new std::thread(&Server::connectionHandler, this);
 }
 
 void Server::stop() {
@@ -44,7 +39,7 @@ void Server::stop() {
     }
   }
 
-  m_thread.join();
+  this->m_thread->join();
 
   LogInfo << SERVER_PREFIX << "server stopped";
 }

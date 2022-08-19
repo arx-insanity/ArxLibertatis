@@ -18,6 +18,8 @@ class ClientData {
     int m_descriptor;
     std::string m_nickname;
     Entity * m_entity;
+
+    std::thread * m_thread;
 };
 
 #endif // ARX_NETWORK_CLIENT_DATA_H
