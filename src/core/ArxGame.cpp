@@ -186,7 +186,8 @@ extern bool START_NEW_QUEST;
 SavegameHandle LOADQUEST_SLOT = SavegameHandle(); // OH NO, ANOTHER GLOBAL! - TEMP PATCH TO CLEAN CODE FLOW
 static fs::path g_saveToLoad;
 
-static Server g_server;
+static Server * g_server = nullptr;
+static Client * g_client = nullptr;
 
 static const PlatformDuration runeDrawPointInterval = 16ms; // ~60fps
 
@@ -593,13 +594,18 @@ static void startAsServer(const std::string & rawPort) {
 		return;
 	}
 
-	g_server.start(port);
+	g_server = new Server();
+	g_server->start(port);
 }
 ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
 
 static void startAsClient(const std::string & rawTarget) {
 	// TODO: parse target as ip + ":" + port
-	// TODO: start client and connect to the server
+	std::string ip = "localhost";
+	long port = 8888;
+
+	g_client = new Client();
+	g_client->connectTo(ip, port);
 }
 ARX_PROGRAM_OPTION_ARG("connect", "", "Join a server at the given address", &startAsClient, "IP:PORT")
 
@@ -949,10 +955,15 @@ void ArxGame::shutdown() {
 	
 	if(m_gameInitialized)
 		shutdownGame();
-	
-	Application::shutdown();
 
-	g_server.stop();
+	if (g_server != nullptr) {
+		g_server->stop();
+	}
+	if (g_client != nullptr) {
+		g_client->disconnect();
+	}
+
+	Application::shutdown();
 
 	LogInfo << "Clean shutdown";
 }

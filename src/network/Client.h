@@ -7,6 +7,7 @@ class Client {
   public:
     Client();
     void connectTo(std::string ip, int port);
+    void disconnect();
 };
 
 #endif // ARX_NETWORK_CLIENT_H
