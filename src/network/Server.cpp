@@ -6,19 +6,18 @@
 #include "network/common.h"
 #include "network/Server.h"
 
-Server::Server() {
+Server::Server(int port) {
+  this->m_port = port;
   this->m_isRunning = false;
 }
 
-void Server::start(int port) {
+void Server::start() {
   if (this->m_isRunning) {
     LogError << SERVER_PREFIX << "server already started";
     return;
   }
 
   LogInfo << SERVER_PREFIX << "server starting...";
-
-  this->m_port = port;
 
   this->m_thread = new std::thread(&Server::connectionHandler, this);
 }

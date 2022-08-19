@@ -1,8 +1,11 @@
 #include "network/Client.h"
 
-Client::Client() {}
+Client::Client(std::string ip, int port) {
+  this->m_ip = ip;
+  this->m_port = port;
+}
 
-void Client::connectTo(std::string ip, int port) {
+void Client::connectTo() {
   // TODO
 }
 

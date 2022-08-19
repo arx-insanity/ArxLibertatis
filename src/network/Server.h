@@ -9,8 +9,8 @@ class Server;
 
 class Server {
   public:
-    Server();
-    void start(int port);
+    Server(int port);
+    void start();
     void stop();
     void disconnect(ClientData * client);
     void broadcast(ClientData * client, std::string event, std::string args = "");
