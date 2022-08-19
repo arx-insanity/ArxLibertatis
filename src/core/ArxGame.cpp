@@ -595,7 +595,11 @@ static void startAsServer(const std::string & rawPort) {
 	}
 
 	g_server = new Server(port);
-	g_server->start();
+
+	// TODO: move this somewhere else, create the server later
+	if (g_server != nullptr) {
+		g_server->start();
+	}
 }
 ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
 
@@ -605,7 +609,11 @@ static void startAsClient(const std::string & rawTarget) {
 	long port = 8888;
 
 	g_client = new Client(ip, port);
-	g_client->connectTo();
+
+	// TODO: move this somewhere else, create the client later
+	if (g_client != nullptr) {
+		g_client->connectTo();
+	}
 }
 ARX_PROGRAM_OPTION_ARG("connect", "", "Join a server at the given address", &startAsClient, "IP:PORT")
 
