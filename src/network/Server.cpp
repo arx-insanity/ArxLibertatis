@@ -1,6 +1,9 @@
+#include <thread>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include "io/log/Logger.h"
+#include "network/common.h"
 #include "network/Server.h"
-
-#define LOGPREFIX "Arx Server: "
 
 // TODO: make this a member of the Server class
 std::thread m_thread;
@@ -11,115 +14,101 @@ Server::Server() {
 
 void Server::start(int port) {
   if (this->m_isRunning) {
-    LogError << LOGPREFIX << "server already started";
+    LogError << SERVER_PREFIX << "server already started";
     return;
   }
 
-  LogInfo << LOGPREFIX << "server starting...";
+  LogInfo << SERVER_PREFIX << "server starting...";
 
   this->m_port = port;
 
-  std::function<void(void)> fn = std::bind(&Server::serverThread, this);
-
+  std::function<void(void)> fn = std::bind(&Server::connectionHandler, this);
   m_thread = std::thread(fn);
 }
 
 void Server::stop() {
   if (!this->m_isRunning) {
-    LogError << LOGPREFIX << "server not running";
+    LogError << SERVER_PREFIX << "server not running";
     return;
   }
 
-  LogInfo << LOGPREFIX << "stopping server...";
+  LogInfo << SERVER_PREFIX << "stopping server...";
 
   this->m_isRunning = false;
   shutdown(this->m_socketDescriptor, SHUT_RD);
   close(this->m_socketDescriptor);
+
+  if (!this->m_clients.empty()) {
+    for(unsigned long int i = 0; i < this->m_clients.size(); i++) {
+      this->m_clients[i]->stopListening();
+    }
+  }
+
   m_thread.join();
 
-  LogInfo << LOGPREFIX << "server stopped";
+  LogInfo << SERVER_PREFIX << "server stopped";
 }
 
-clientInfo * Server::findClientByDescriptor(int descriptor) {
+ClientData * Server::findClientByDescriptor(int descriptor) {
   if (this->m_clients.empty()) {
     return nullptr;
   }
 
   for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
-    if (this->m_clients[i].descriptor == descriptor) {
-      return &this->m_clients[i];
+    if (this->m_clients[i]->getDescriptor() == descriptor) {
+      return this->m_clients[i];
     }
   }
 
   return nullptr;
 }
 
-void Server::serverThread() {
+void Server::connectionHandler() {
   this->m_isRunning = true;
 
   this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (this->m_socketDescriptor == -1) {
-    LogError << LOGPREFIX << "could not create socket";
+    LogError << SERVER_PREFIX << "could not create socket";
     return;
   }
 
-  struct sockaddr_in server;
+  sockaddr_in server;
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons(this->m_port);
 
-  int resultOfBinding = bind(this->m_socketDescriptor, (struct sockaddr *)&server, sizeof(server));
+  int resultOfBinding = bind(this->m_socketDescriptor, (sockaddr *)&server, sizeof(server));
   if (resultOfBinding < 0) {
-    LogError << LOGPREFIX << "bind failed";
+    LogError << SERVER_PREFIX << "bind failed";
     return;
   }
 
   listen(this->m_socketDescriptor, 3);
 
-  LogInfo << LOGPREFIX << "server started at port " << std::to_string(this->m_port);
+  LogInfo << SERVER_PREFIX << "server started at port " << std::to_string(this->m_port);
 
-  socklen_t c = sizeof(struct sockaddr_in);
-
-  struct sockaddr_in client;
+  socklen_t c = sizeof(sockaddr_in);
+  sockaddr_in client;
   int clientDescriptor;
 
-  while ((clientDescriptor = accept(this->m_socketDescriptor, (struct sockaddr *)&client, &c)) > 0) {
-    LogInfo << LOGPREFIX << "connection accepted";
+  while ((clientDescriptor = accept(this->m_socketDescriptor, (sockaddr *)&client, &c)) > 0) {
+    LogInfo << SERVER_PREFIX << "client connecting...";
 
-    // TODO: create thread for client
+    ClientData clientData(clientDescriptor);
+    clientData.write(SERVER_PREFIX + "connecting...");
+    clientData.listen();
 
-    // pthread_t sniffer_thread;
-    // void *new_sock;
-    // new_sock = malloc(1);
-    // *(int*)new_sock = new_socket;
-    
-    // if (pthread_create( &sniffer_thread, NULL,  connection_handler, new_sock) < 0) {
-    //   LogError << LOGPREFIX << "Could not create thread for the connection handler";
-    //   return;
-    // }
+    this->m_clients.push_back(&clientData);
   }
 
   if (clientDescriptor < 0 && this->m_isRunning) {
-    LogError << LOGPREFIX << "accepting connections failed";
+    LogError << SERVER_PREFIX << "accepting connections failed";
     return;
   }
-
-  /*
-    message = "Arx Server: Connected\n";
-    write(new_socket, message, strlen(message));
-
-    message = "Arx Server: Assigning handler...\n";
-    write(new_socket, message, strlen(message));
-
-    LogInfo << LOGPREFIX << "Connection handler assigned to client";
-  }
-  */
 }
 
 /*
 extern PlatformInstant REQUEST_JUMP;
-
-std::vector<clientData> clients;
 
 int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
   if (clients.empty()) {
@@ -135,72 +124,6 @@ int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
   return -1;
 }
 
-void *startServer(void *portArg) {
-  unsigned int port = *(unsigned int*)portArg;
-  int new_socket;
-  int c;
-  void *new_sock;
-  struct sockaddr_in server;
-  struct sockaddr_in client;
-  char *message;
-
-  self.clientId = 'server';
-  self.nickname = 'Server';
-  
-  // Create socket
-  serverSocketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-  if (serverSocketDescriptor == -1) {
-    LogError << LOGPREFIX << "could not create socket";
-    return nullptr;
-  }
-  
-  // Prepare the sockaddr_in structure
-  server.sin_family = AF_INET;
-  server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(port);
-
-  LogInfo << LOGPREFIX << "binding done, created server at port " << port;
-
-  listen(serverSocketDescriptor, NUMBER_OF_CONNECTIONS);
-
-  // Accept and incoming connection
-  LogInfo << LOGPREFIX << "Waiting for incoming connections...";
-  c = sizeof(struct sockaddr_in);
-  while ((new_socket = accept(serverSocketDescriptor, (struct sockaddr *)&client, (socklen_t*)&c))) {
-    LogInfo << LOGPREFIX << "Connection accepted";
-    
-    message = "Arx Server: Connected\n";
-    write(new_socket, message, strlen(message));
-
-    message = "Arx Server: Assigning handler...\n";
-    write(new_socket, message, strlen(message));
-    
-    pthread_t sniffer_thread;
-    new_sock = malloc(1);
-    *(int*)new_sock = new_socket;
-    
-    if (pthread_create( &sniffer_thread, NULL,  connection_handler, new_sock) < 0) {
-      LogError << LOGPREFIX << "Could not create thread for the connection handler";
-      return nullptr;
-    }
-
-    LogInfo << LOGPREFIX << "Connection handler assigned to client";
-  }
-  
-  if (new_socket < 0) {
-    LogError << LOGPREFIX << "Accepting connections failed";
-    return nullptr;
-  }
-
-  return nullptr;
-}
-
-void stopServer() {
-  LogInfo << LOGPREFIX << "Stopping server";
-
-  close(serverSocketDescriptor);
-}
-
 void __broadcast(int sender, std::string message) {
   char messageToBroadcast[3000];
 
@@ -211,7 +134,7 @@ void __broadcast(int sender, std::string message) {
   //   REQUEST_JUMP = g_platformTime.frameStart();
   // }
 
-  struct clientData * client = findClientById(sender);
+  clientData * client = findClientById(sender);
   // TODO: in the future sender might be the server, compare it with self
 
   if (boost::starts_with(message, "/")) {
@@ -240,7 +163,7 @@ void __broadcast(int sender, std::string message) {
 }
 
 void __connect(int clientId) {
-  struct clientData client;
+  clientData client;
   client.clientId = clientId;
   client.nickname = "client #" + std::to_string(clientId);
 
