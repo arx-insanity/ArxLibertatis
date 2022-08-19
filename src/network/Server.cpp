@@ -80,7 +80,7 @@ void Server::connectionHandler() {
     return;
   }
 
-  listen(this->m_socketDescriptor, 3);
+  listen(this->m_socketDescriptor, 3); // 3 = maximum connections?
 
   LogInfo << SERVER_PREFIX << "server started at port " << std::to_string(this->m_port);
 

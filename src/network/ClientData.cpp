@@ -8,7 +8,7 @@
 
 ClientData::ClientData(int descriptor, Server * server) {
   this->m_descriptor = descriptor;
-  this->m_nickname = "client #" + descriptor;
+  this->m_nickname = "client #" + std::to_string(descriptor);
   this->m_entity = nullptr;
   this->m_server = server;
 }
@@ -53,26 +53,21 @@ void ClientData::stopListening() {
 }
 
 void ClientData::connectionHandler() {
-  LogInfo << SERVER_PREFIX << "client connected";
+  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_descriptor) << " connected";
   this->write(SERVER_PREFIX + "connected, welcome to Arx!");
 
   this->m_server->broadcast(this, "joined");
 
   bool clientWantsToQuit = false;
 
-  std::string input;
-  std::string::size_type commandSize;
-  std::string command;
-  std::string args;
-
   do {
-    input = this->read();
+    std::string input = this->read();
 
     if (!input.empty()) {
       if (boost::starts_with(input, "/")) {
-        commandSize = input.find(" ", 0);
-        command = input.substr(1, commandSize - 1);
-        args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
+        std::string::size_type commandSize = input.find(" ", 0);
+        std::string command = input.substr(1, commandSize - 1);
+        std::string args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
 
         if (command == "exit" || command == "quit") {
           this->write(SERVER_PREFIX + "disconnected, goodbye!");
@@ -96,6 +91,6 @@ void ClientData::connectionHandler() {
     fflush(stdout);
   }
 
-  LogInfo << SERVER_PREFIX << "client disconnected";
+  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_descriptor) << " disconnected";
   this->m_server->disconnect(this);
 }
