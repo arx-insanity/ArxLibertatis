@@ -1,32 +1,19 @@
 #ifndef ARX_NETWORK_SERVER_H
 #define ARX_NETWORK_SERVER_H
 
+class Server;
+
 #include <thread>
 #include <vector>
 #include "network/ClientData.h"
-
-/*
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/erase.hpp>
-
-#include "core/GameTime.h"
-#include "gui/Notification.h"
-*/
-
-/*
-void __connect(int clientId);
-
-void __disconnect(int clientId);
-
-void __broadcast(int sender, std::string message);
-*/
 
 class Server {
   public:
     Server();
     void start(int port);
     void stop();
+    void disconnect(ClientData * client);
+    void broadcast(ClientData * client, std::string event, std::string args = "");
 
   private:
     ClientData * findClientByDescriptor(int descriptor);

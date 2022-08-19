@@ -1,6 +1,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "io/log/Logger.h"
+#include "core/GameTime.h"
+#include "gui/Notification.h"
 #include "network/common.h"
 #include "network/Server.h"
 
@@ -89,11 +91,11 @@ void Server::connectionHandler() {
   while ((clientDescriptor = accept(this->m_socketDescriptor, (sockaddr *)&client, &c)) > 0) {
     LogInfo << SERVER_PREFIX << "client connecting...";
 
-    ClientData clientData(clientDescriptor);
-    clientData.write(SERVER_PREFIX + "connecting...");
-    clientData.listen();
+    ClientData * clientData = new ClientData(clientDescriptor, this);
+    clientData->write(SERVER_PREFIX + "connecting...");
+    clientData->listen();
 
-    this->m_clients.push_back(&clientData);
+    this->m_clients.push_back(clientData);
   }
 
   if (clientDescriptor < 0 && this->m_isRunning) {
@@ -102,121 +104,46 @@ void Server::connectionHandler() {
   }
 }
 
-/*
-extern PlatformInstant REQUEST_JUMP;
-
-int findClientIndexById(const std::vector<clientData> &clients, int clientId) {
-  if (clients.empty()) {
-    return -1;
+void Server::disconnect(ClientData * client) {
+  if (this->m_clients.empty()) {
+    return;
   }
 
-  for (int i = 0; i < clients.size(); i++) {
-    if (clients[i].clientId == clientId) {
-      return i;
+  for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+    if (this->m_clients[i] == client) {
+      this->broadcast(client, "disconnected");
+      this->m_clients.erase(this->m_clients.begin() + i);
+      return;
     }
   }
-
-  return -1;
 }
 
-void __broadcast(int sender, std::string message) {
-  char messageToBroadcast[3000];
-
-  int size = sprintf(messageToBroadcast, "client #%d: %s\n", sender, message.c_str());
-
-  // if (message == "jump") {
-  //   // make the player jump
-  //   REQUEST_JUMP = g_platformTime.frameStart();
-  // }
-
-  clientData * client = findClientById(sender);
-  // TODO: in the future sender might be the server, compare it with self
-
-  if (boost::starts_with(message, "/")) {
-    std::string::size_type commandSize = message.find(" ", 0);
-    std::string command = message.substr(1, commandSize - 1);
-    std::string text = boost::trim_copy(boost::erase_head_copy(message, commandSize));
-
-    if (command == "say") {
-      if (!text.empty()) {
-        notification_add(std::string((*client).nickname + ": " + text));
-      }
-    } else if (command == "nickname") {
-      if (!text.empty()) {
-        (*client).nickname = text;
+// broadcast a message to every client except the one in the params
+void Server::broadcast(ClientData * client, std::string event, std::string args) {
+  if (event == "joined") {
+    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+      if (this->m_clients[i] != client) {
+        this->m_clients[i]->write(client->getNickname() + " joined the server");
       }
     }
-  }
-
-  LogInfo << LOGPREFIX << "client #" << sender << ": " << message;
-
-  for (char i = 0; i < clients.size(); i++) {
-    if (clients[i].clientId != sender) {
-      write(clients[i].clientId, messageToBroadcast, size);
+  } else if (event == "disconnected") {
+    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+      if (this->m_clients[i] != client) {
+        this->m_clients[i]->write(client->getNickname() + " disconnected");
+      }
+    }
+  } else if (event == "say") {
+    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+      if (this->m_clients[i] != client) {
+        this->m_clients[i]->write(client->getNickname() + ": " + args);
+      }
+    }
+  } else if (event == "make-host") {
+    if (args == "jump") {
+      extern PlatformInstant REQUEST_JUMP;
+      REQUEST_JUMP = g_platformTime.frameStart();
+    } else {
+      client->write("unknown argument '" + args + "' for /make-host");
     }
   }
 }
-
-void __connect(int clientId) {
-  clientData client;
-  client.clientId = clientId;
-  client.nickname = "client #" + std::to_string(clientId);
-
-  clients.push_back(client);
-
-  __broadcast(clientId, "joined the server");
-}
-
-void __disconnect(int clientId) {
-  int idx = findClientIndexById(clients, clientId);
-  if (idx != -1) {
-    __broadcast(clientId, "disconnected from the server");
-    clients.erase(clients.begin() + idx);
-  }
-}
-
-void *connection_handler(void *clientSocketDescriptor) {
-  int clientId = *(int*)clientSocketDescriptor;
-  char *message;
-  char client_message[2000];
-
-  __connect(clientId);
-
-  message = "Arx Server: Handler assigned, welcome to Arx!\n";
-  write(clientId, message, strlen(message));
-
-  int raw_read_size = 0;
-  bool clientWantsToQuit = false;
-
-  do {
-    // Receive a message from client
-    raw_read_size = recv(clientId, client_message, 2000, 0);
-
-    std::string messageAsString(client_message, raw_read_size);
-    boost::trim(messageAsString);
-
-    if (messageAsString == "/exit" || messageAsString == "/quit") {
-      std::string goodbyeMessage = "Arx Server: Disconnected, goodbye!\n";
-      write(clientId, goodbyeMessage.c_str(), goodbyeMessage.size());
-      clientWantsToQuit = true;
-    }
-
-    if (!messageAsString.empty() && !clientWantsToQuit) {
-      __broadcast(clientId, messageAsString);
-    }
-  } while (raw_read_size > 0 && !clientWantsToQuit);
-  
-  if (raw_read_size == 0 || clientWantsToQuit) {
-    // TODO: can we tell TELNET to quit?
-    fflush(stdout);
-  } else if (raw_read_size == -1) {
-    LogError << LOGPREFIX << "Reading message from client using recv failed";
-  }
-
-  // Free the socket pointer
-  free(clientSocketDescriptor);
-  __disconnect(clientId);
-
-  return 0;
-}
-*/
