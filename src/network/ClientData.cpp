@@ -84,7 +84,9 @@ void ClientData::connectionHandler() {
         } else if (command == "make-host") {
           this->m_server->broadcast(this, "make-host", args);
         } else if (command == "nickname") {
-          this->m_nickname = args;
+          if (args != "") {
+            this->m_nickname = args;
+          }
         }
       }
     }

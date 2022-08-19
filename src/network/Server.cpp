@@ -118,7 +118,6 @@ void Server::disconnect(ClientData * client) {
   }
 }
 
-// broadcast a message to every client except the one in the params
 void Server::broadcast(ClientData * client, std::string event, std::string args) {
   if (event == "joined") {
     for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
@@ -134,9 +133,7 @@ void Server::broadcast(ClientData * client, std::string event, std::string args)
     }
   } else if (event == "say") {
     for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
-      if (this->m_clients[i] != client) {
-        this->m_clients[i]->write(client->getNickname() + ": " + args);
-      }
+      this->m_clients[i]->write(client->getNickname() + ": " + args);
     }
   } else if (event == "make-host") {
     if (args == "jump") {
