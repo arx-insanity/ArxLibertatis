@@ -63,6 +63,8 @@ void ClientData::connectionHandler() {
   do {
     std::string input = this->read();
 
+    LogInfo << "--- ClientData: got message from client '" << input << "'";
+
     if (!input.empty()) {
       if (boost::starts_with(input, "/")) {
         std::string::size_type commandSize = input.find(" ", 0);

@@ -44,7 +44,7 @@ void Client::disconnect() {
 
 std::string Client::read() {
   char rawInput[2000];
-  int rawReadSize = ::read(this->m_clientDescriptor, rawInput, 2000);
+  int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 2000);
 
   if (rawReadSize == 0) {
     return "/quit";
@@ -91,7 +91,10 @@ void Client::connectionHandler() {
 
   do {
     std::string input = this->read();
-    LogInfo << "--------- '" << input << "'";
+    LogInfo << "--- Client: got message from server '" << input << "'";
+    if (input == "/quit") {
+      this->m_isQuitting = true;
+    }
   } while (!this->m_isQuitting);
 
   if (this->m_isQuitting) {
