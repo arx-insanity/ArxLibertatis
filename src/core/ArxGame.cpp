@@ -605,14 +605,14 @@ ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the speci
 
 static void startAsClient(const std::string & rawTarget) {
 	// TODO: parse target as ip + ":" + port
-	std::string ip = "localhost";
+	std::string ip = "127.0.0.1";
 	long port = 8888;
 
 	g_client = new Client(ip, port);
 
 	// TODO: move this somewhere else, create the client later
 	if (g_client != nullptr) {
-		g_client->connectTo();
+		g_client->connect();
 	}
 }
 ARX_PROGRAM_OPTION_ARG("connect", "", "Join a server at the given address", &startAsClient, "IP:PORT")

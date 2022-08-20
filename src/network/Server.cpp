@@ -1,5 +1,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include "io/log/Logger.h"
 #include "core/GameTime.h"
 #include "gui/Notification.h"
@@ -31,7 +32,7 @@ void Server::stop() {
   LogInfo << SERVER_PREFIX << "stopping server...";
 
   this->m_isRunning = false;
-  shutdown(this->m_socketDescriptor, SHUT_RD);
+  shutdown(this->m_socketDescriptor, SHUT_RDWR);
   close(this->m_socketDescriptor);
 
   if (!this->m_clients.empty()) {
@@ -63,7 +64,7 @@ void Server::connectionHandler() {
   this->m_isRunning = true;
 
   this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-  if (this->m_socketDescriptor == -1) {
+  if (this->m_socketDescriptor < 0) {
     LogError << SERVER_PREFIX << "could not create socket";
     return;
   }

@@ -7,14 +7,15 @@
 #include "network/ClientData.h"
 
 ClientData::ClientData(int descriptor, Server * server) {
-  this->m_descriptor = descriptor;
+  this->m_clientDescriptor = descriptor;
   this->m_nickname = "client #" + std::to_string(descriptor);
   this->m_entity = nullptr;
   this->m_server = server;
+  this->m_isQuitting = false;
 }
 
 int ClientData::getDescriptor() {
-  return this->m_descriptor;
+  return this->m_clientDescriptor;
 }
 
 std::string ClientData::getNickname() {
@@ -22,20 +23,20 @@ std::string ClientData::getNickname() {
 }
 
 void ClientData::write(std::string message) {
-  ::write(this->m_descriptor, (message + EOL).c_str(), message.size() + 1);
+  ::write(this->m_clientDescriptor, (message + EOL).c_str(), message.size() + 1);
 }
 
 std::string ClientData::read() {
   char rawInput[2000];
-  int rawReadSize = recv(this->m_descriptor, rawInput, 2000, 0);
+  int rawReadSize = ::read(this->m_clientDescriptor, rawInput, 2000);
 
   if (rawReadSize == 0) {
     return "/quit";
   }
 
   // TODO: error handling
-  if (rawReadSize == -1) {
-    // failed to read with recv
+  if (rawReadSize < 0) {
+    // failed to read
   }
 
   std::string input(rawInput, rawReadSize);
@@ -49,16 +50,15 @@ void ClientData::listen() {
 }
 
 void ClientData::stopListening() {
+  this->m_isQuitting = true;
   this->m_thread->join();
 }
 
 void ClientData::connectionHandler() {
-  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_descriptor) << " connected";
+  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_clientDescriptor) << " connected";
   this->write(SERVER_PREFIX + "connected, welcome to Arx!");
 
   this->m_server->broadcast(this, "joined");
-
-  bool clientWantsToQuit = false;
 
   do {
     std::string input = this->read();
@@ -71,7 +71,7 @@ void ClientData::connectionHandler() {
 
         if (command == "exit" || command == "quit") {
           this->write(SERVER_PREFIX + "disconnected, goodbye!");
-          clientWantsToQuit = true;
+          this->m_isQuitting = true;
         } else if (command == "say") {
           if (args != "") {
             this->m_server->broadcast(this, "say", args);
@@ -85,12 +85,12 @@ void ClientData::connectionHandler() {
         }
       }
     }
-  } while (!clientWantsToQuit);
+  } while (!this->m_isQuitting);
   
-  if (clientWantsToQuit) {
+  if (this->m_isQuitting) {
     fflush(stdout);
   }
 
-  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_descriptor) << " disconnected";
+  LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_clientDescriptor) << " disconnected";
   this->m_server->disconnect(this);
 }

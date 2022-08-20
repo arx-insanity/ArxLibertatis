@@ -22,7 +22,6 @@ class Server {
     int m_port;
     bool m_isRunning;
     int m_socketDescriptor;
-
     std::vector<ClientData *> m_clients;
     std::thread * m_thread;
 };
