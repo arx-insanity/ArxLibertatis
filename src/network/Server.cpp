@@ -37,6 +37,7 @@ void Server::stop() {
 
   if (!this->m_clients.empty()) {
     for(unsigned long int i = 0; i < this->m_clients.size(); i++) {
+      this->m_clients[i]->write(MessageTypeServerStopped);
       this->m_clients[i]->stopListening();
     }
   }

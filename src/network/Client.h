@@ -15,6 +15,8 @@ class Client {
     void write(std::string message);
     std::string read();
 
+    void changeLevel(long int level);
+
     std::string m_ip;
     int m_port;
     bool m_isRunning;

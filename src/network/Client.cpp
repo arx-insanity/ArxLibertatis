@@ -4,12 +4,11 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/erase.hpp>
-// #include "gui/LoadLevelScreen.h"
+#include "core/Core.h"
+#include "game/Player.h"
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/Client.h"
-// #include "scene/ChangeLevel.h"
-// #include "scene/LoadLevel.h"
 
 Client::Client(std::string ip, int port) {
   this->m_ip = ip;
@@ -51,6 +50,10 @@ std::string Client::read() {
   MessageType messageType;
   ::read(this->m_socketDescriptor, (char *)&messageType, sizeof(messageType));
 
+  if (messageType == MessageTypeServerStopped) {
+    return "/quit";
+  }
+  
   if (messageType == MessageTypeChangeLevel) {
     char rawInput[10];
     int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 10);
@@ -58,25 +61,6 @@ std::string Client::read() {
 
     return "/changeLevelTo " + input;
   }
-
-  /*
-  char rawInput[2000];
-  int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 2000);
-
-  if (rawReadSize == 0) {
-    return "/quit";
-  }
-
-  // TODO: error handling
-  if (rawReadSize < 0) {
-    // failed to read
-  }
-
-  std::string input(rawInput, rawReadSize);
-  boost::trim(input);
-
-  return input;
-  */
 
   return "";
 }
@@ -105,34 +89,23 @@ void Client::connectionHandler() {
     return;
   }
 
-  LogInfo << SERVER_PREFIX << "connected";
+  LogInfo << CLIENT_PREFIX << "connected";
 
   do {
     std::string input = this->read();
     if (input != "") {
-      // LogInfo << "from server: " << input;
-
       if (boost::starts_with(input, "/")) {
         std::string::size_type commandSize = input.find(" ", 0);
         std::string command = input.substr(1, commandSize - 1);
         std::string args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
 
+        LogInfo << CLIENT_PREFIX << "/" + command + " " + args;
+
         if (command == "quit" || command == "exit") {
           this->m_isQuitting = true;
         } else if (command == "changeLevelTo") {
-          long int levelId = strtol(args.c_str(), nullptr, 10);
-          LogInfo << "changing level to " << args;
-          
-          // TODO: force the client to load the level without actually crashing the game
-          /*
-          // ARX_CHANGELEVEL_Change(levelId, "", 0);
-
-          ARX_CHANGELEVEL_StartNew();
-          progressBarReset();
-          progressBarSetTotal(108);
-          LoadLevelScreen(levelId);
-          DanaeLoadLevel(levelId);
-          */
+          long int level = strtol(args.c_str(), nullptr, 10);
+          this->changeLevel(level);
         }
       }
     }
@@ -141,4 +114,11 @@ void Client::connectionHandler() {
   if (this->m_isQuitting) {
     fflush(stdout);
   }
+}
+
+void Client::changeLevel(long int level) {
+  TELEPORT_TO_LEVEL = level;
+  TELEPORT_TO_POSITION = "";
+  TELEPORT_TO_ANGLE = static_cast<long>(player.angle.getYaw());
+  CHANGE_LEVEL_ICON = ChangeLevelNow;
 }
