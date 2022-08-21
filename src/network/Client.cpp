@@ -97,7 +97,10 @@ void Client::connectionHandler() {
       if (boost::starts_with(input, "/")) {
         std::string::size_type commandSize = input.find(" ", 0);
         std::string command = input.substr(1, commandSize - 1);
-        std::string args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
+        std::string args = "";
+        if (commandSize < input.size() + 1) {
+          args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
+        }
 
         LogInfo << CLIENT_PREFIX << "/" + command + " " + args;
 
