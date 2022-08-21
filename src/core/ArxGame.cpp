@@ -170,6 +170,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
+#include "network/common.h"
 #include "network/Server.h"
 #include "network/Client.h"
 
@@ -186,8 +187,8 @@ extern bool START_NEW_QUEST;
 SavegameHandle LOADQUEST_SLOT = SavegameHandle(); // OH NO, ANOTHER GLOBAL! - TEMP PATCH TO CLEAN CODE FLOW
 static fs::path g_saveToLoad;
 
-static Server * g_server = nullptr;
-static Client * g_client = nullptr;
+extern Server * g_server = nullptr;
+extern Client * g_client = nullptr;
 
 static const PlatformDuration runeDrawPointInterval = 16ms; // ~60fps
 
@@ -684,6 +685,10 @@ static bool HandleGameFlowTransitions() {
 	}
 
 	if(GameFlow::getTransition() == GameFlow::LoadingScreen) {
+		if (g_server != nullptr) {
+			g_server->broadcast(nullptr, MessageTypeChangeLevel, std::to_string(LEVEL_TO_LOAD));
+		}
+
 		ARX_INTERFACE_KillFISHTANK();
 		ARX_INTERFACE_KillARKANE();
 		
@@ -694,8 +699,9 @@ static bool HandleGameFlowTransitions() {
 		progressBarReset();
 		progressBarSetTotal(108);
 		LoadLevelScreen(LEVEL_TO_LOAD);
-		
+
 		DanaeLoadLevel(LEVEL_TO_LOAD);
+
 		GameFlow::setTransition(GameFlow::InGame);
 		return false;
 	}

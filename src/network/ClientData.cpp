@@ -22,11 +22,16 @@ std::string ClientData::getNickname() {
   return this->m_nickname;
 }
 
-void ClientData::write(std::string message) {
-  ::write(this->m_clientDescriptor, (message + EOL).c_str(), message.size() + 1);
+void ClientData::write(MessageType messageType, std::string payload) {
+  ::write(this->m_clientDescriptor, (char *)&messageType, sizeof(messageType));
+
+  if (payload != "") {
+    ::write(this->m_clientDescriptor, payload.c_str(), payload.size());
+  }
 }
 
 std::string ClientData::read() {
+  /*
   char rawInput[2000];
   int rawReadSize = ::read(this->m_clientDescriptor, rawInput, 2000);
 
@@ -43,6 +48,9 @@ std::string ClientData::read() {
   boost::trim(input);
 
   return input;
+  */
+
+  return "";
 }
 
 void ClientData::listen() {
@@ -55,6 +63,7 @@ void ClientData::stopListening() {
 }
 
 void ClientData::connectionHandler() {
+  /*
   LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_clientDescriptor) << " connected";
   this->write(SERVER_PREFIX + "connected, welcome to Arx!");
 
@@ -95,4 +104,5 @@ void ClientData::connectionHandler() {
 
   LogInfo << SERVER_PREFIX << "client #" << std::to_string(this->m_clientDescriptor) << " disconnected";
   this->m_server->disconnect(this);
+  */
 }

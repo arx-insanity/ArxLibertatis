@@ -13,7 +13,7 @@ class Server {
     void start();
     void stop();
     void disconnect(ClientData * client);
-    void broadcast(ClientData * client, std::string event, std::string args = "");
+    void broadcast(ClientData * client, MessageType messageType, std::string payload = "");
 
   private:
     ClientData * findClientByDescriptor(int descriptor);

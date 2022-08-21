@@ -9,21 +9,12 @@ const std::string CLIENT_PREFIX = "Arx Client: ";
 const std::string SERVER_PREFIX = "Arx Server: ";
 
 enum MessageType {
-  MessageTypeLoadLevel = 1,
+  MessageTypeChangeLevel = 1,
   MessageTypeServerStopped
 };
 
-struct MessageLoadLevel {
-  unsigned char levelId;
-};
-
-enum DisconnectType {
-  DisconnectTypeServerStopped,
-  DisconnectTypeClientDisconnected,
-};
-
-struct MessageDisconnected {
-  DisconnectType reason;
+struct MessagePayloadChangeLevel {
+  long levelId;
 };
 
 #endif // ARX_NETWORK_COMMON_H

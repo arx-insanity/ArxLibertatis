@@ -51,7 +51,7 @@ ClientData * Server::findClientByDescriptor(int descriptor) {
     return nullptr;
   }
 
-  for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
     if (this->m_clients[i]->getDescriptor() == descriptor) {
       return this->m_clients[i];
     }
@@ -92,7 +92,7 @@ void Server::connectionHandler() {
     LogInfo << SERVER_PREFIX << "client connecting...";
 
     ClientData * clientData = new ClientData(clientDescriptor, this);
-    clientData->write(SERVER_PREFIX + "connecting...");
+    // clientData->write(SERVER_PREFIX + "connecting...");
     clientData->listen();
 
     this->m_clients.push_back(clientData);
@@ -105,42 +105,26 @@ void Server::connectionHandler() {
 }
 
 void Server::disconnect(ClientData * client) {
-  if (this->m_clients.empty()) {
+  if (this->m_clients.size() <= 1) {
     return;
   }
 
-  for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
+  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
     if (this->m_clients[i] == client) {
-      this->broadcast(client, "disconnected");
       this->m_clients.erase(this->m_clients.begin() + i);
       return;
     }
   }
 }
 
-void Server::broadcast(ClientData * client, std::string event, std::string args) {
-  if (event == "joined") {
-    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
-      if (this->m_clients[i] != client) {
-        this->m_clients[i]->write(client->getNickname() + " joined the server");
-      }
-    }
-  } else if (event == "disconnected") {
-    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
-      if (this->m_clients[i] != client) {
-        this->m_clients[i]->write(client->getNickname() + " disconnected");
-      }
-    }
-  } else if (event == "say") {
-    for (long unsigned int i = 0; i < this->m_clients.size(); i++) {
-      this->m_clients[i]->write(client->getNickname() + ": " + args);
-    }
-  } else if (event == "make-host") {
-    if (args == "jump") {
-      extern PlatformInstant REQUEST_JUMP;
-      REQUEST_JUMP = g_platformTime.frameStart();
-    } else {
-      client->write("unknown argument '" + args + "' for /make-host");
+void Server::broadcast(ClientData * client, MessageType messageType, std::string payload) {
+  if (this->m_clients.empty()) {
+    return;
+  }
+
+  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
+    if (this->m_clients[i] != client) {
+      this->m_clients[i]->write(messageType, payload);
     }
   }
 }

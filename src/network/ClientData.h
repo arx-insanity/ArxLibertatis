@@ -6,7 +6,7 @@ class ClientData;
 #include <string>
 #include <thread>
 #include "game/Entity.h"
-
+#include "network/common.h"
 #include "network/Server.h"
 
 class ClientData {
@@ -14,7 +14,7 @@ class ClientData {
     ClientData(int descriptor, Server * server);
     int getDescriptor();
     std::string getNickname();
-    void write(std::string message);
+    void write(MessageType messageType, std::string payload = "");
     void listen();
     void stopListening();
 

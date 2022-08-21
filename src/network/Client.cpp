@@ -2,9 +2,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/erase.hpp>
+// #include "gui/LoadLevelScreen.h"
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/Client.h"
+// #include "scene/ChangeLevel.h"
+// #include "scene/LoadLevel.h"
 
 Client::Client(std::string ip, int port) {
   this->m_ip = ip;
@@ -43,6 +48,18 @@ void Client::disconnect() {
 }
 
 std::string Client::read() {
+  MessageType messageType;
+  ::read(this->m_socketDescriptor, (char *)&messageType, sizeof(messageType));
+
+  if (messageType == MessageTypeChangeLevel) {
+    char rawInput[10];
+    int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 10);
+    std::string input(rawInput, rawReadSize);
+
+    return "/changeLevelTo " + input;
+  }
+
+  /*
   char rawInput[2000];
   int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 2000);
 
@@ -59,10 +76,13 @@ std::string Client::read() {
   boost::trim(input);
 
   return input;
+  */
+
+  return "";
 }
 
 void Client::write(std::string message) {
-  ::write(this->m_socketDescriptor, (message + EOL).c_str(), message.size() + 1);
+  // ::write(this->m_socketDescriptor, (message + EOL).c_str(), message.size() + 1);
 }
 
 void Client::connectionHandler() {
@@ -87,19 +107,38 @@ void Client::connectionHandler() {
 
   LogInfo << SERVER_PREFIX << "connected";
 
-  this->write("/say hello!!!");
-
   do {
     std::string input = this->read();
-    LogInfo << "--- Client: got message from server '" << input << "'";
-    if (input == "/quit") {
-      this->m_isQuitting = true;
+    if (input != "") {
+      // LogInfo << "from server: " << input;
+
+      if (boost::starts_with(input, "/")) {
+        std::string::size_type commandSize = input.find(" ", 0);
+        std::string command = input.substr(1, commandSize - 1);
+        std::string args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
+
+        if (command == "quit" || command == "exit") {
+          this->m_isQuitting = true;
+        } else if (command == "changeLevelTo") {
+          long int levelId = strtol(args.c_str(), nullptr, 10);
+          LogInfo << "changing level to " << args;
+          
+          // TODO: force the client to load the level without actually crashing the game
+          /*
+          // ARX_CHANGELEVEL_Change(levelId, "", 0);
+
+          ARX_CHANGELEVEL_StartNew();
+          progressBarReset();
+          progressBarSetTotal(108);
+          LoadLevelScreen(levelId);
+          DanaeLoadLevel(levelId);
+          */
+        }
+      }
     }
   } while (!this->m_isQuitting);
 
   if (this->m_isQuitting) {
     fflush(stdout);
   }
-
-  ::close(this->m_clientDescriptor);
 }
