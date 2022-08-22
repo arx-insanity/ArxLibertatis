@@ -35,11 +35,9 @@ void Server::stop() {
   shutdown(this->m_socketDescriptor, SHUT_RDWR);
   close(this->m_socketDescriptor);
 
-  if (!this->m_clients.empty()) {
-    for(unsigned long int i = 0; i < this->m_clients.size(); i++) {
-      this->m_clients[i]->write(MessageTypeServerStopped);
-      this->m_clients[i]->stopListening();
-    }
+  for (ClientData * client: this->m_clients) {
+    client->write(MessageTypeServerStopped);
+    client->stopListening();
   }
 
   this->m_thread->join();
@@ -48,13 +46,9 @@ void Server::stop() {
 }
 
 ClientData * Server::findClientByDescriptor(int descriptor) {
-  if (this->m_clients.empty()) {
-    return nullptr;
-  }
-
-  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
-    if (this->m_clients[i]->getDescriptor() == descriptor) {
-      return this->m_clients[i];
+  for (ClientData * client: this->m_clients) {
+    if (client->getDescriptor() == descriptor) {
+      return client;
     }
   }
 
@@ -117,14 +111,10 @@ void Server::disconnect(ClientData * client) {
   }
 }
 
-void Server::broadcast(ClientData * client, MessageType messageType, std::string payload) {
-  if (this->m_clients.empty()) {
-    return;
-  }
-
-  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
-    if (this->m_clients[i] != client) {
-      this->m_clients[i]->write(messageType, payload);
+void Server::broadcast(ClientData * invoker, MessageType messageType, std::string payload) {
+  for (ClientData * client: this->m_clients) {
+    if (client != invoker) {
+      client->write(messageType, payload);
     }
   }
 }
