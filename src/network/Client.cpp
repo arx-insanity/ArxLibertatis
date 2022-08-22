@@ -13,42 +13,42 @@
 Client::Client(std::string ip, int port) {
   this->m_ip = ip;
   this->m_port = port;
-  this->m_isRunning = false;
+  this->m_isConnected = false;
   this->m_isQuitting = false;
 }
 
 void Client::connect() {
-  if (this->m_isRunning) {
-    LogError << "already connected to a server";
+  if (this->m_isConnected) {
+    LogError << "Can't connect to a server, already connected";
     return;
   }
 
-  LogInfo << "connecting to server...";
+  LogInfo << "Connecting to server...";
 
   this->m_thread = new std::thread(&Client::connectionHandler, this);
 }
 
 void Client::disconnect() {
-  if (!this->m_isRunning) {
-    LogError << "not connected to a server";
+  if (!this->m_isConnected) {
+    LogError << "Can't disconnect from server, not connected";
     return;
   }
 
-  LogInfo << "disconnecting from server...";
+  LogInfo << "Disconnecting from server...";
 
   this->m_isQuitting = true;
-  this->m_isRunning = false;
+  this->m_isConnected = false;
   shutdown(this->m_socketDescriptor, SHUT_RDWR);
   close(this->m_socketDescriptor);
 
   this->m_thread->join();
 
-  LogInfo << "server stopped";
+  LogInfo << "Disconnected";
 }
 
 std::string Client::read() {
-  if (!this->m_isRunning) {
-    LogError << "not connected to a server";
+  if (!this->m_isConnected) {
+    LogError << "Can't read remote data, not connected to a server";
     return "";
   }
 
@@ -71,8 +71,8 @@ std::string Client::read() {
 }
 
 void Client::write(std::string message) {
-  if (!this->m_isRunning) {
-    LogError << "not connected to a server";
+  if (!this->m_isConnected) {
+    LogError << "Can't write to server, not connected";
     return;
   }
 
@@ -80,11 +80,11 @@ void Client::write(std::string message) {
 }
 
 void Client::connectionHandler() {
-  this->m_isRunning = true;
+  this->m_isConnected = true;
 
   this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (this->m_socketDescriptor == -1) {
-    LogError << "could not create socket";
+    LogError << "Could not create socket";
     return;
   }
 
@@ -95,11 +95,11 @@ void Client::connectionHandler() {
 
   this->m_clientDescriptor = ::connect(this->m_socketDescriptor, (sockaddr *)&client, sizeof(client));
   if (this->m_clientDescriptor < 0) {
-    LogError << "could not connect to the server";
+    LogError << "Could not connect to the server";
     return;
   }
 
-  LogInfo << "connected";
+  LogInfo << "Connected";
 
   do {
     std::string input = this->read();
@@ -128,7 +128,11 @@ void Client::connectionHandler() {
     fflush(stdout);
   }
 
-  this->m_isRunning = false;
+  this->m_isConnected = false;
+}
+
+bool Client::isConnected() {
+  return this->m_isConnected;
 }
 
 void Client::changeLevel(long int level) {

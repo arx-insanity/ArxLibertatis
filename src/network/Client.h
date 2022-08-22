@@ -9,6 +9,7 @@ class Client {
     Client(std::string ip, int port);
     void connect();
     void disconnect();
+    bool isConnected();
 
   private:
     void connectionHandler();
@@ -19,7 +20,7 @@ class Client {
 
     std::string m_ip;
     int m_port;
-    bool m_isRunning;
+    bool m_isConnected;
     int m_socketDescriptor;
     int m_clientDescriptor;
     std::thread * m_thread;

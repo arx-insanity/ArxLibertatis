@@ -612,7 +612,7 @@ static void startAsClient(const std::string & rawTarget) {
 	g_client = new Client(ip, port);
 
 	// TODO: move this somewhere else, create the client later
-	if (g_client != nullptr) {
+	if (g_client != nullptr && g_client->isConnected()) {
 		g_client->connect();
 	}
 }
@@ -973,7 +973,7 @@ void ArxGame::shutdown() {
 	if (g_server != nullptr) {
 		g_server->stop();
 	}
-	if (g_client != nullptr) {
+	if (g_client != nullptr && g_client->isConnected()) {
 		g_client->disconnect();
 	}
 
