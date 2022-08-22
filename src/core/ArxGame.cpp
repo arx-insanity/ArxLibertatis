@@ -598,7 +598,7 @@ static void startAsServer(const std::string & rawPort) {
 	g_server = new Server(port);
 
 	// TODO: move this somewhere else, create the server later
-	if (g_server != nullptr) {
+	if (g_server != nullptr && g_server->isRunning()) {
 		g_server->start();
 	}
 }
@@ -685,7 +685,7 @@ static bool HandleGameFlowTransitions() {
 	}
 
 	if(GameFlow::getTransition() == GameFlow::LoadingScreen) {
-		if (g_server != nullptr) {
+		if (g_server != nullptr && g_server->isRunning()) {
 			g_server->broadcast(nullptr, MessageTypeChangeLevel, std::to_string(LEVEL_TO_LOAD));
 		}
 
@@ -970,7 +970,7 @@ void ArxGame::shutdown() {
 	if(m_gameInitialized)
 		shutdownGame();
 
-	if (g_server != nullptr) {
+	if (g_server != nullptr && g_server->isRunning()) {
 		g_server->stop();
 	}
 	if (g_client != nullptr && g_client->isConnected()) {

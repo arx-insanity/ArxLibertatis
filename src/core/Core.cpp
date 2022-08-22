@@ -1153,7 +1153,7 @@ void DrawImproveVisionInterface() {
 extern Server * g_server;
 
 void DANAE_StartNewQuest() {
-	if (g_server != nullptr) {
+	if (g_server != nullptr && g_server->isRunning()) {
 		g_server->broadcast(nullptr, MessageTypeChangeLevel, "1");
 	}
 	benchmark::begin(benchmark::LoadLevel);
