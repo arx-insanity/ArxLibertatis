@@ -14,6 +14,7 @@ class Server {
     void stop();
     void disconnect(ClientData * client);
     void broadcast(ClientData * client, MessageType messageType, std::string payload = "");
+    bool isRunning();
 
   private:
     ClientData * findClientByDescriptor(int descriptor);

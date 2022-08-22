@@ -14,22 +14,22 @@ Server::Server(int port) {
 
 void Server::start() {
   if (this->m_isRunning) {
-    LogError << "server already started";
+    LogError << "Can't start server, already started";
     return;
   }
 
-  LogInfo << "server starting...";
+  LogInfo << "Server starting...";
 
   this->m_thread = new std::thread(&Server::connectionHandler, this);
 }
 
 void Server::stop() {
   if (!this->m_isRunning) {
-    LogError << "server not running";
+    LogError << "Can't stop server, not running";
     return;
   }
 
-  LogInfo << "stopping server...";
+  LogInfo << "Stopping server...";
 
   this->m_isRunning = false;
   shutdown(this->m_socketDescriptor, SHUT_RDWR);
@@ -44,7 +44,7 @@ void Server::stop() {
 
   this->m_thread->join();
 
-  LogInfo << "server stopped";
+  LogInfo << "Server stopped";
 }
 
 ClientData * Server::findClientByDescriptor(int descriptor) {
@@ -66,7 +66,7 @@ void Server::connectionHandler() {
 
   this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (this->m_socketDescriptor < 0) {
-    LogError << "could not create socket";
+    LogError << "Could not create socket";
     return;
   }
 
@@ -77,30 +77,29 @@ void Server::connectionHandler() {
 
   int resultOfBinding = bind(this->m_socketDescriptor, (sockaddr *)&server, sizeof(server));
   if (resultOfBinding < 0) {
-    LogError << "bind failed";
+    LogError << "Bind failed";
     return;
   }
 
   listen(this->m_socketDescriptor, 3); // 3 = maximum connections?
 
-  LogInfo << "server started at port " << std::to_string(this->m_port);
+  LogInfo << "Server started @ localhost:" << std::to_string(this->m_port);
 
   socklen_t c = sizeof(sockaddr_in);
   sockaddr_in client;
   int clientDescriptor;
 
   while ((clientDescriptor = accept(this->m_socketDescriptor, (sockaddr *)&client, &c)) > 0) {
-    LogInfo << "client connecting...";
+    LogInfo << "Client connecting...";
 
     ClientData * clientData = new ClientData(clientDescriptor, this);
-    // clientData->write("connecting...");
     clientData->listen();
 
     this->m_clients.push_back(clientData);
   }
 
   if (clientDescriptor < 0 && this->m_isRunning) {
-    LogError << "accepting connections failed";
+    LogError << "Accepting connections failed";
     return;
   }
 }
@@ -128,4 +127,8 @@ void Server::broadcast(ClientData * client, MessageType messageType, std::string
       this->m_clients[i]->write(messageType, payload);
     }
   }
+}
+
+bool Server::isRunning() {
+  return this->m_isRunning;
 }
