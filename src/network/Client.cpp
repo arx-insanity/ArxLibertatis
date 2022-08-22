@@ -19,22 +19,22 @@ Client::Client(std::string ip, int port) {
 
 void Client::connect() {
   if (this->m_isRunning) {
-    LogError << CLIENT_PREFIX << "already connected to a server";
+    LogError << "already connected to a server";
     return;
   }
 
-  LogInfo << CLIENT_PREFIX << "connecting to server...";
+  LogInfo << "connecting to server...";
 
   this->m_thread = new std::thread(&Client::connectionHandler, this);
 }
 
 void Client::disconnect() {
   if (!this->m_isRunning) {
-    LogError << CLIENT_PREFIX << "not connected to a server";
+    LogError << "not connected to a server";
     return;
   }
 
-  LogInfo << CLIENT_PREFIX << "disconnecting from server...";
+  LogInfo << "disconnecting from server...";
 
   this->m_isQuitting = true;
   this->m_isRunning = false;
@@ -43,10 +43,15 @@ void Client::disconnect() {
 
   this->m_thread->join();
 
-  LogInfo << CLIENT_PREFIX << "server stopped";
+  LogInfo << "server stopped";
 }
 
 std::string Client::read() {
+  if (!this->m_isRunning) {
+    LogError << "not connected to a server";
+    return "";
+  }
+
   MessageType messageType;
   ::read(this->m_socketDescriptor, (char *)&messageType, sizeof(messageType));
 
@@ -66,6 +71,11 @@ std::string Client::read() {
 }
 
 void Client::write(std::string message) {
+  if (!this->m_isRunning) {
+    LogError << "not connected to a server";
+    return;
+  }
+
   // ::write(this->m_socketDescriptor, (message + EOL).c_str(), message.size() + 1);
 }
 
@@ -74,7 +84,7 @@ void Client::connectionHandler() {
 
   this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
   if (this->m_socketDescriptor == -1) {
-    LogError << CLIENT_PREFIX << "could not create socket";
+    LogError << "could not create socket";
     return;
   }
 
@@ -85,11 +95,11 @@ void Client::connectionHandler() {
 
   this->m_clientDescriptor = ::connect(this->m_socketDescriptor, (sockaddr *)&client, sizeof(client));
   if (this->m_clientDescriptor < 0) {
-    LogError << CLIENT_PREFIX << "could not connect to the server";
+    LogError << "could not connect to the server";
     return;
   }
 
-  LogInfo << CLIENT_PREFIX << "connected";
+  LogInfo << "connected";
 
   do {
     std::string input = this->read();
@@ -102,7 +112,7 @@ void Client::connectionHandler() {
           args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
         }
 
-        LogInfo << CLIENT_PREFIX << "/" + command + " " + args;
+        LogInfo << "/" + command + " " + args;
 
         if (command == "quit" || command == "exit") {
           this->m_isQuitting = true;
@@ -117,6 +127,8 @@ void Client::connectionHandler() {
   if (this->m_isQuitting) {
     fflush(stdout);
   }
+
+  this->m_isRunning = false;
 }
 
 void Client::changeLevel(long int level) {

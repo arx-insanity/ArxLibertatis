@@ -5,9 +5,6 @@
 
 #define EOL "\n"
 
-const std::string CLIENT_PREFIX = "Arx Client: ";
-const std::string SERVER_PREFIX = "Arx Server: ";
-
 enum MessageType {
   MessageTypeChangeLevel = 1,
   MessageTypeServerStopped
