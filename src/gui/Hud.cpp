@@ -1210,7 +1210,7 @@ void DamagedEquipmentGui::update() {
 			if(ratio < 1.0f) {
 				m_colors[i] = Color::rgb(1.f - ratio, ratio, 0);
 			} else {
-				m_colors[i] = Color::rgb(0, 0.615f, 1.f);
+				m_colors[i] = Color::rgb(0, 1.f, 1.f);
 			}
 		}
 		
