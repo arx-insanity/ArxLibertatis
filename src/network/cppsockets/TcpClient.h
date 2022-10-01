@@ -53,7 +53,7 @@ namespace CppSockets {
 			freeaddrinfo(_addressInfo);
 		}
 
-		int sendData(void* buf, int len)
+		int sendData(const void* buf, int len)
 		{
 			return send(_sock, (const char*)buf, len, 0);
 		}
