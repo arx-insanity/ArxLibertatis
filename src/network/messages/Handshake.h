@@ -2,17 +2,23 @@
 
 struct Handshake : public Message {
 	std::string name;
+
+	Handshake() {}
+
 	Handshake(std::string name) : name(name) {
 
 	}
 
-	virtual void send(std::shared_ptr<CppSockets::TcpClient> client) {
+	virtual void send(std::vector<unsigned char>& buffer) {
 		size_t len = name.length();
-		client->sendData(&len, sizeof(len));
-		client->sendData(name.c_str(), len);
+		buffer.resize(len);
+		unsigned char* buf = buffer.data();
+		memcpy(buf, &len, sizeof(len));
+		memcpy(buf + sizeof(len), name.c_str(), len);
 	}
-	virtual void read(std::shared_ptr<unsigned char> buffer) {
-		char* buf = (char*)buffer.get();
+
+	virtual void read(const unsigned char* buffer, const size_t bufferLen) {
+		char* buf = (char*)buffer;
 		size_t len = *(size_t*)buf;
 		name.clear();
 		name.reserve(len);
