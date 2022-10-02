@@ -12,7 +12,7 @@ class Client {
 	int port;
 	std::shared_ptr<CppSockets::TcpClient> client;
 	std::shared_ptr<std::thread> readerThread;
-	std::string nickname;
+	//std::string nickname;
 	std::mutex clientMutex;
 	bool readerRunning;
 
@@ -28,7 +28,7 @@ class Client {
     void disconnect();
     bool isConnected();
 
-	void sendMessage(FrameHeader header, unsigned char* body, uint32_t bodyLength);
+	void sendMessage(FrameHeader header, unsigned char* body);
 	void sendMessage(uint16_t messageType);
 	void sendMessage(MessageType messageType);
 	void sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer);

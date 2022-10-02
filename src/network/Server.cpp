@@ -4,6 +4,8 @@
 #include "network/common.h"
 #include "network/Server.h"
 #include "network/messages/Message.h"
+#include "network/messages/Handshake.h"
+#include "network/messages/LevelChange.h"
 
 Server::Server(int port) :port(port) {}
 
@@ -77,6 +79,28 @@ void Server::broadcast(uint32_t sender, MessageType messageType, Message* messag
 	broadcast(sender, static_cast<uint16_t>(messageType), buffer);
 }
 
-void Server::handleClientMessage(ClientData* sender, uint16_t messageType, std::vector<unsigned char>& buffer) {
+void Server::handleClientMessage(ClientData* sender, MessageType messageType, std::vector<unsigned char>& buffer) {
 	//TODO: this is going to be one ugly switch case for now
+	switch (messageType) {
+	case MessageType::Handshake:
+	{
+		Handshake hs;
+		hs.read(buffer.data(), buffer.size());
+		{
+			sender->setNickname(hs.getName());
+		}
+		break;
+	}
+	case MessageType::ChangeLevel:
+	{
+		LevelChange msg;
+		msg.read(buffer.data(), buffer.size());
+		broadcast(sender->getId(), static_cast<uint16_t>(messageType), buffer);
+		break;
+	}
+	case MessageType::ChatMessage:
+		break;
+	case MessageType::ServerStopped:
+		break;
+	}
 }

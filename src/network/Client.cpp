@@ -6,8 +6,10 @@
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/Client.h"
+#include "network/messages/LevelChange.h"
+#include "network/messages/Handshake.h"
 
-Client::Client(std::string ip, int port) : ip(ip), port(port) {
+Client::Client(std::string ip, int port) : ip(ip), port(port), readerRunning(false) {
 	id = rand();
 }
 
@@ -52,6 +54,10 @@ void Client::connect() {
 	CppSockets::cppSocketsInit();
 	client = std::make_shared<CppSockets::TcpClient>(ip.c_str(), port);
 	this->readerThread = std::make_shared<std::thread>(&Client::readerLoop, this);
+
+	Handshake msg;
+	this->sendMessage(MessageType::Handshake, &msg);
+
 	LogInfo << "Connected";
 }
 
@@ -69,7 +75,15 @@ void Client::disconnect() {
 void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& buffer) {
 	switch (messageType) {
 	case MessageType::ChangeLevel:
+	{
+		LevelChange msg;
+		msg.read(buffer.data(), buffer.size());
+		TELEPORT_TO_LEVEL = msg.level;
+		TELEPORT_TO_POSITION = "";
+		TELEPORT_TO_ANGLE = static_cast<long>(player.angle.getYaw());
+		CHANGE_LEVEL_ICON = ChangeLevelNow;
 		break;
+	}
 	case MessageType::ChatMessage:
 		break;
 	case MessageType::ServerStopped:
@@ -77,91 +91,37 @@ void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& 
 	}
 }
 
-/*std::string Client::read() {
-	if (!this->m_isConnected) {
-		LogError << "Can't read remote data, not connected to a server";
-		return "";
-	}
-
-	MessageType messageType;
-	::read(this->m_socketDescriptor, (char*)&messageType, sizeof(messageType));
-
-	if (messageType == MessageTypeServerStopped) {
-		return "/quit";
-	}
-
-	if (messageType == MessageTypeChangeLevel) {
-		char rawInput[10];
-		int rawReadSize = ::read(this->m_socketDescriptor, rawInput, 10);
-		std::string input(rawInput, rawReadSize);
-
-		return "/changeLevelTo " + input;
-	}
-
-	return "";
-}
-
-void Client::connectionHandler() {
-	this->m_isConnected = true;
-
-	this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-	if (this->m_socketDescriptor == -1) {
-		LogError << "Could not create socket";
-		return;
-	}
-
-	sockaddr_in client;
-	client.sin_family = AF_INET;
-	client.sin_addr.s_addr = inet_addr(this->m_ip.c_str());
-	client.sin_port = htons(this->m_port);
-
-	this->m_clientDescriptor = ::connect(this->m_socketDescriptor, (sockaddr*)&client, sizeof(client));
-	if (this->m_clientDescriptor < 0) {
-		LogError << "Could not connect to the server";
-		return;
-	}
-
-	LogInfo << "Connected";
-
-	do {
-		std::string input = this->read();
-		if (input != "") {
-			if (boost::starts_with(input, "/")) {
-				std::string::size_type commandSize = input.find(" ", 0);
-				std::string command = input.substr(1, commandSize - 1);
-				std::string args = "";
-				if (commandSize < input.size() + 1) {
-					args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
-				}
-
-				LogInfo << "/" + command + " " + args;
-
-				if (command == "quit" || command == "exit") {
-					this->m_isQuitting = true;
-				}
-				else if (command == "changeLevelTo") {
-					long int level = strtol(args.c_str(), nullptr, 10);
-					this->changeLevel(level);
-				}
-			}
-		}
-	} while (!this->m_isQuitting);
-
-	if (this->m_isQuitting) {
-		fflush(stdout);
-	}
-
-	this->m_isConnected = false;
-}*/
-
 bool Client::isConnected() {
 	return this->readerRunning;
 }
 
-/*void Client::changeLevel(long int level) {
-	//guess this is to change level locally
-	TELEPORT_TO_LEVEL = level;
-	TELEPORT_TO_POSITION = "";
-	TELEPORT_TO_ANGLE = static_cast<long>(player.angle.getYaw());
-	CHANGE_LEVEL_ICON = ChangeLevelNow;
-}*/
+void  Client::sendMessage(FrameHeader header, unsigned char* body) {
+	client->sendData(&header, sizeof(header));
+	if (header.length > 0 && body != NULL) {
+		client->sendData(body, header.length);
+	}
+}
+void  Client::sendMessage(uint16_t messageType) {
+	FrameHeader fh;
+	fh.length = 0;
+	fh.messageType = messageType;
+	fh.sender = id;
+	sendMessage(fh, NULL);
+}
+void  Client::sendMessage(MessageType messageType) {
+	sendMessage(static_cast<uint16_t>(messageType));
+
+}
+void  Client::sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer) {
+	FrameHeader fh;
+	fh.length = buffer.size();
+	fh.messageType = messageType;
+	fh.sender = id;
+	sendMessage(fh, buffer.data());
+}
+void  Client::sendMessage(MessageType messageType, Message* message) {
+	std::vector<unsigned char> buffer;
+	message->send(buffer);
+	sendMessage(static_cast<uint16_t>(messageType), buffer);
+}
+

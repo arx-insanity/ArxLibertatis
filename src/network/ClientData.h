@@ -17,6 +17,7 @@ class ClientData {
 	std::shared_ptr<std::thread> readerThread;
 	std::string nickname;
 	std::mutex clientMutex;
+	uint32_t id;
 	bool readerRunning;
 
 	void readerLoop();
@@ -28,6 +29,8 @@ public:
 	ClientData(Server* server, std::shared_ptr<CppSockets::TcpClient> client);
 	~ClientData();
 	std::string getNickname();
+	void setNickname(std::string name);
+	uint32_t getId();
 	std::shared_ptr<CppSockets::TcpClient> getClient();
 	Server* getServer();
 	void startReading();

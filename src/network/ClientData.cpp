@@ -18,6 +18,14 @@ std::string ClientData::getNickname() {
 	return nickname;
 }
 
+void ClientData::setNickname(std::string name) {
+	nickname = name;
+}
+
+uint32_t ClientData::getId() {
+	return id;
+}
+
 std::shared_ptr<CppSockets::TcpClient> ClientData::getClient() {
 	return client;
 }
@@ -52,16 +60,8 @@ void ClientData::readerLoop() {
 			buffer.resize(writePos + received);
 			memcpy(&buffer[writePos], constBuffer, received);
 		}
-		//TODO: move the name assignment to server
-		if (frameHeader.messageType == static_cast<uint16_t>(MessageType::Handshake)) {
-			Handshake hs;
-			hs.read(buffer.data(), buffer.size());
-			{
-				LOCK_GUARD(clientMutex);
-				this->nickname = hs.getName();
-			}
-		}
-		server->handleClientMessage(this, frameHeader.messageType, buffer);
+		id = frameHeader.sender;
+		server->handleClientMessage(this, static_cast<MessageType>(frameHeader.messageType), buffer);
 		buffer.clear();
 	}
 exitReaderLoop:
