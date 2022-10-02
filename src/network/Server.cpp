@@ -7,7 +7,9 @@
 #include "network/messages/Handshake.h"
 #include "network/messages/LevelChange.h"
 
-Server::Server(int port) :port(port) {}
+Server::Server(int port) :port(port) {
+	LogInfo << "Server constructed";
+}
 
 void Server::start() {
 	if (isRunning()) {
@@ -43,6 +45,7 @@ void Server::stop() {
 }
 
 void Server::serverAccept(std::shared_ptr<CppSockets::TcpClient> client) {
+	LogInfo << "Client Connecting...";
 	LOCK_GUARD(serverMutex);
 	std::shared_ptr<ClientData> cd = std::make_shared<ClientData>(this, client);
 	clients.push_back(cd);
@@ -85,6 +88,7 @@ void Server::broadcast(uint32_t sender, MessageType messageType, Message* messag
 
 void Server::handleClientMessage(ClientData* sender, MessageType messageType, std::vector<unsigned char>& buffer) {
 	//TODO: this is going to be one ugly switch case for now
+	LogInfo << "Getting message from client " << sender->getId() << " message type: " << static_cast<uint16_t>(messageType);
 	switch (messageType) {
 	case MessageType::Handshake:
 	{
