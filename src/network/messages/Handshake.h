@@ -10,7 +10,7 @@ struct Handshake : public Message {
 	}
 
 	virtual void send(std::vector<unsigned char>& buffer) {
-		writeString(name, buffer);
+		write(name, buffer);
 	}
 
 	virtual void read(const unsigned char* buffer, const size_t bufferLen) {

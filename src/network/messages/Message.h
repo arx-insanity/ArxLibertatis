@@ -6,7 +6,7 @@ struct Message {
 	virtual void send(std::vector<unsigned char>& buffer) = 0;
 	virtual void read(const unsigned char* buffer, const size_t bufferLen) = 0;
 
-	static void writeSizeT(const size_t size, std::vector<unsigned char>& buffer) {
+	static void write(const size_t size, std::vector<unsigned char>& buffer) {
 		size_t writePos = buffer.size();
 		buffer.resize(buffer.size() + sizeof(size));
 		memcpy(&buffer[writePos], &size, sizeof(size));
@@ -18,9 +18,9 @@ struct Message {
 		return len;
 	}
 
-	static void writeString(const std::string& str, std::vector<unsigned char>& buffer) {
+	static void write(const std::string& str, std::vector<unsigned char>& buffer) {
 		size_t len = str.length();
-		writeSizeT(len, buffer);
+		write(len, buffer);
 		size_t writePos = buffer.size();
 		buffer.resize(buffer.size() + len);
 		memcpy(&buffer[writePos], str.c_str(), len);
