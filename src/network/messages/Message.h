@@ -1,9 +1,11 @@
+#ifndef NETWORK_MESSAGES_MESSAGE_H
+#define NETWORK_MESSAGES_MESSAGE_H
 #include "network/cppsockets/TcpClient.h"
 #include <vector>
 #include <cstring>
 
 struct Message {
-	virtual ~Message() = 0;
+	virtual ~Message() {};
 	virtual void send(std::vector<unsigned char>& buffer) = 0;
 	virtual void read(const unsigned char* buffer, const size_t bufferLen) = 0;
 
@@ -35,3 +37,5 @@ protected:
 		return val;
 	}
 };
+
+#endif // NETWORK_MESSAGES_MESSAGE_H

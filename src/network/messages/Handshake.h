@@ -1,3 +1,5 @@
+#ifndef NETWORK_MESSAGES_HANDSHAKE_H
+#define NETWORK_MESSAGES_HANDSHAKE_H
 #include "network/messages/Message.h"
 
 class Handshake : public Message {
@@ -23,3 +25,4 @@ public:
 		name = readString(buffer);
 	}
 };
+#endif // NETWORK_MESSAGES_HANDSHAKE_H

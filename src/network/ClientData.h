@@ -32,7 +32,7 @@ public:
 	Server* getServer();
 	void startReading();
 	void stopReading();
-	void sendMessage(FrameHeader header, unsigned char* body, uint32_t bodyLength);
+	void sendMessage(FrameHeader header, unsigned char* body);
 };
 
 #endif // ARX_NETWORK_CLIENT_DATA_H

@@ -90,9 +90,10 @@ void ClientData::stopReading() {
 	}
 }
 
-void ClientData::sendMessage(FrameHeader header, unsigned char* body, uint32_t bodyLength) {
+void ClientData::sendMessage(FrameHeader header, unsigned char* body) {
+	LOCK_GUARD(clientMutex);
 	client->sendData(&header, sizeof(header));
-	if (body != NULL && bodyLength > 0) {
-		client->sendData(body, bodyLength);
+	if (body != NULL && header.length > 0) {
+		client->sendData(body, header.length);
 	}
 }

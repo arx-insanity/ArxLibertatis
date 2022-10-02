@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORK_CPPSOCKETS_TCPCLIENT_H
+#define NETWORK_CPPSOCKETS_TCPCLIENT_H
 
 #include "network/cppsockets/Socket.h"
 #include <cstring>
@@ -83,3 +84,4 @@ namespace CppSockets {
 	};
 }
 
+#endif // NETWORK_CPPSOCKETS_TCPCLIENT_H

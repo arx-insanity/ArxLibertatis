@@ -3,28 +3,36 @@
 
 #include <thread>
 #include <string>
+#include "network/cppsockets/TcpClient.h"
+#include "network/messages/Message.h"
 
 class Client {
+	uint32_t id;
+	std::string ip;
+	int port;
+	std::shared_ptr<CppSockets::TcpClient> client;
+	std::shared_ptr<std::thread> readerThread;
+	std::string nickname;
+	std::mutex clientMutex;
+	bool readerRunning;
+
+	void readerLoop();
+	void handleMessage(MessageType messageType, std::vector<unsigned char> &buffer);
+
+	//no copy or assignment
+	Client(const Client& other) = delete;
+	Client& operator=(const Client&) = delete;
   public:
     Client(std::string ip, int port);
     void connect();
     void disconnect();
     bool isConnected();
 
-  private:
-    void connectionHandler();
-    void write(std::string message);
-    std::string read();
-
-    void changeLevel(long int level);
-
-    std::string m_ip;
-    int m_port;
-    bool m_isConnected;
-    int m_socketDescriptor;
-    int m_clientDescriptor;
-    std::thread * m_thread;
-    bool m_isQuitting;
+	void sendMessage(FrameHeader header, unsigned char* body, uint32_t bodyLength);
+	void sendMessage(uint16_t messageType);
+	void sendMessage(MessageType messageType);
+	void sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer);
+	void sendMessage(MessageType messageType, Message* message);
 };
 
 #endif // ARX_NETWORK_CLIENT_H

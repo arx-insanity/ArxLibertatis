@@ -599,7 +599,7 @@ static void startAsServer(const std::string & rawPort) {
 	g_server = new Server(port);
 
 	// TODO: move this somewhere else, create the server later
-	if (g_server != nullptr && g_server->isRunning()) {
+	if (g_server != nullptr && !g_server->isRunning()) {
 		g_server->start();
 	}
 }
@@ -613,7 +613,7 @@ static void startAsClient(const std::string & rawTarget) {
 	g_client = new Client(ip, port);
 
 	// TODO: move this somewhere else, create the client later
-	if (g_client != nullptr && g_client->isConnected()) {
+	if (g_client != nullptr && !g_client->isConnected()) {
 		g_client->connect();
 	}
 }

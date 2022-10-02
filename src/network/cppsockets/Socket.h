@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORK_CPPSOCKETS_SOCKET_H
+#define NETWORK_CPPSOCKETS_SOCKET_H
 #include "network/cppsockets/CppSocketsUtil.h"
 
 namespace CppSockets {
@@ -31,3 +32,4 @@ namespace CppSockets {
 	};
 
 }
+#endif // NETWORK_CPPSOCKETS_SOCKET_H

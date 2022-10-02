@@ -337,7 +337,7 @@ endif()
 # Win32 API
 if(WIN32)
 	# Ensure we aren't using functionalities not found under Window XP SP1
-	add_definitions(-D_WIN32_WINNT=0x0502)
+	#add_definitions(-D_WIN32_WINNT=0x0502)
 	# Define this so that we don't accitenally use ANSI functions
 	add_definitions(-DUNICODE)
 	add_definitions(-D_UNICODE)
@@ -980,6 +980,7 @@ set(NETWORK_SOURCES
 	src/network/ClientData.cpp
 	src/network/Server.cpp
 	src/network/Client.cpp
+  src/network/cppsockets/CppSocketsUtil.cpp
 )
 
 set(GAME_SOURCES

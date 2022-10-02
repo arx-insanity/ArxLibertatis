@@ -15,6 +15,7 @@ void Server::start() {
 
 	LogInfo << "Server starting...";
 
+	CppSockets::cppSocketsInit();
 	tcpServer = std::make_shared<CppSockets::TcpServer>(port);
 	tcpServer->acceptCallback = std::bind(std::mem_fn(&Server::serverAccept), this, std::placeholders::_1);
 	tcpServer->startListening();
@@ -52,16 +53,21 @@ void Server::broadcast(uint32_t sender, uint16_t messageType) {
 	fh.messageType = messageType;
 	fh.length = 0;
 	for (std::shared_ptr<ClientData> client : clients) {
-		client->sendMessage(fh, NULL, 0);
+		client->sendMessage(fh, NULL);
 	}
 }
+
+void Server::broadcast(uint32_t sender, MessageType messageType) {
+	broadcast(sender, static_cast<uint16_t>(messageType));
+}
+
 void Server::broadcast(uint32_t sender, uint16_t messageType, std::vector<unsigned char>& buffer) {
 	FrameHeader fh;
 	fh.sender = sender;
 	fh.messageType = messageType;
 	fh.length = buffer.size();
 	for (std::shared_ptr<ClientData> client : clients) {
-		client->sendMessage(fh, buffer.data(), buffer.size());
+		client->sendMessage(fh, buffer.data());
 	}
 }
 

@@ -97,6 +97,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "network/common.h"
 #include "network/Server.h"
+#include "network/messages/LevelChange.h"
 
 #include "physics/Physics.h"
 
@@ -1377,7 +1378,8 @@ extern Server * g_server;
 
 static long ARX_CHANGELEVEL_Pop_Level(long num, bool firstTime) {
 	if (g_server != nullptr && g_server->isRunning()) {
-		g_server->broadcast(nullptr, MessageTypeChangeLevel, std::to_string(num));
+		LevelChange msg(num);
+		g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
 	}
 
 	LOAD_N_ERASE = false;

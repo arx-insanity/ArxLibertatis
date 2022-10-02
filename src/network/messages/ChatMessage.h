@@ -1,3 +1,5 @@
+#ifndef NETWORK_MESSAGES_CHATMESSAGE_H
+#define NETWORK_MESSAGES_CHATMESSAGE_H
 #include "network/messages/Message.h"
 
 struct ChatMessage : public Message {
@@ -20,3 +22,4 @@ struct ChatMessage : public Message {
 		message = readString(buffer);
 	}
 };
+#endif // NETWORK_MESSAGES_CHATMESSAGE_H
