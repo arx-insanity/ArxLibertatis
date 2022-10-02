@@ -173,6 +173,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "network/common.h"
 #include "network/Server.h"
 #include "network/Client.h"
+#include "network/messages/LevelChange.h"
 
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
@@ -686,7 +687,8 @@ static bool HandleGameFlowTransitions() {
 
 	if(GameFlow::getTransition() == GameFlow::LoadingScreen) {
 		if (g_server != nullptr && g_server->isRunning()) {
-			g_server->broadcast(nullptr, MessageTypeChangeLevel, std::to_string(LEVEL_TO_LOAD));
+			LevelChange msg(LEVEL_TO_LOAD);
+			g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
 		}
 
 		ARX_INTERFACE_KillFISHTANK();

@@ -1,124 +1,76 @@
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include "io/log/Logger.h"
 #include "core/GameTime.h"
 #include "gui/Notification.h"
 #include "network/common.h"
 #include "network/Server.h"
+#include "network/messages/Message.h"
 
-Server::Server(int port) {
-  this->m_port = port;
-  this->m_isRunning = false;
-}
+Server::Server(int port) :port(port) {}
 
 void Server::start() {
-  if (this->m_isRunning) {
-    LogError << "Can't start server, already started";
-    return;
-  }
+	if (isRunning()) {
+		LogError << "Can't start server, already started";
+		return;
+	}
 
-  LogInfo << "Server starting...";
+	LogInfo << "Server starting...";
 
-  this->m_thread = new std::thread(&Server::connectionHandler, this);
+	tcpServer = std::make_shared<CppSockets::TcpServer>(port);
+	tcpServer->acceptCallback = std::bind(std::mem_fn(&Server::serverAccept), this, std::placeholders::_1);
+	tcpServer->startListening();
 }
 
 void Server::stop() {
-  if (!this->m_isRunning) {
-    LogError << "Can't stop server, not running";
-    return;
-  }
+	if (!isRunning()) {
+		LogError << "Can't stop server, not running";
+		return;
+	}
 
-  LogInfo << "Stopping server...";
+	LogInfo << "Stopping server...";
 
-  this->m_isRunning = false;
-  shutdown(this->m_socketDescriptor, SHUT_RDWR);
-  close(this->m_socketDescriptor);
+	//TODO: tell all clients server stopped
 
-  for (ClientData * client: this->m_clients) {
-    client->write(MessageTypeServerStopped);
-    client->stopListening();
-  }
+	tcpServer->stopListening();
 
-  this->m_thread->join();
-
-  LogInfo << "Server stopped";
+	LogInfo << "Server stopped";
 }
 
-ClientData * Server::findClientByDescriptor(int descriptor) {
-  for (ClientData * client: this->m_clients) {
-    if (client->getDescriptor() == descriptor) {
-      return client;
-    }
-  }
-
-  return nullptr;
+void Server::serverAccept(std::shared_ptr<CppSockets::TcpClient> client) {
+	LOCK_GUARD(serverMutex);
+	std::shared_ptr<ClientData> cd = std::make_shared<ClientData>(this, client);
+	clients.push_back(cd);
 }
 
-void Server::connectionHandler() {
-  this->m_isRunning = true;
-
-  this->m_socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
-  if (this->m_socketDescriptor < 0) {
-    LogError << "Could not create socket";
-    return;
-  }
-
-  sockaddr_in server;
-  server.sin_family = AF_INET;
-  server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port = htons(this->m_port);
-
-  int resultOfBinding = bind(this->m_socketDescriptor, (sockaddr *)&server, sizeof(server));
-  if (resultOfBinding < 0) {
-    LogError << "Bind failed";
-    return;
-  }
-
-  listen(this->m_socketDescriptor, 3); // 3 = maximum connections?
-
-  LogInfo << "Server started @ localhost:" << std::to_string(this->m_port);
-
-  socklen_t c = sizeof(sockaddr_in);
-  sockaddr_in client;
-  int clientDescriptor;
-
-  while ((clientDescriptor = accept(this->m_socketDescriptor, (sockaddr *)&client, &c)) > 0) {
-    LogInfo << "Client connecting...";
-
-    ClientData * clientData = new ClientData(clientDescriptor, this);
-    clientData->listen();
-
-    this->m_clients.push_back(clientData);
-  }
-
-  if (clientDescriptor < 0 && this->m_isRunning) {
-    LogError << "Accepting connections failed";
-    return;
-  }
-}
-
-void Server::disconnect(ClientData * client) {
-  if (this->m_clients.size() <= 1) {
-    return;
-  }
-
-  for (unsigned long int i = 0; i < this->m_clients.size(); i++) {
-    if (this->m_clients[i] == client) {
-      this->m_clients.erase(this->m_clients.begin() + i);
-      return;
-    }
-  }
-}
-
-void Server::broadcast(ClientData * invoker, MessageType messageType, std::string payload) {
-  for (ClientData * client: this->m_clients) {
-    if (client != invoker) {
-      client->write(messageType, payload);
-    }
-  }
-}
 
 bool Server::isRunning() {
-  return this->m_isRunning;
+	return this->tcpServer->isListening();
+}
+
+void Server::broadcast(uint32_t sender, uint16_t messageType) {
+	FrameHeader fh;
+	fh.sender = sender;
+	fh.messageType = messageType;
+	fh.length = 0;
+	for (std::shared_ptr<ClientData> client : clients) {
+		client->sendMessage(fh, NULL, 0);
+	}
+}
+void Server::broadcast(uint32_t sender, uint16_t messageType, std::vector<unsigned char>& buffer) {
+	FrameHeader fh;
+	fh.sender = sender;
+	fh.messageType = messageType;
+	fh.length = buffer.size();
+	for (std::shared_ptr<ClientData> client : clients) {
+		client->sendMessage(fh, buffer.data(), buffer.size());
+	}
+}
+
+void Server::broadcast(uint32_t sender, MessageType messageType, Message* message) {
+	std::vector<unsigned char> buffer;
+	message->send(buffer);
+	broadcast(sender, static_cast<uint16_t>(messageType), buffer);
+}
+
+void Server::handleClientMessage(ClientData* sender, uint16_t messageType, std::vector<unsigned char>& buffer) {
+	//TODO: this is going to be one ugly switch case for now
 }

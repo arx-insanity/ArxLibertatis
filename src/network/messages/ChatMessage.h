@@ -19,8 +19,4 @@ struct ChatMessage : public Message {
 		sender = readString(buffer);
 		message = readString(buffer);
 	}
-private:
-	virtual ~ChatMessage() {
-
-	}
 };

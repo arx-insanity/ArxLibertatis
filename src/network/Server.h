@@ -1,30 +1,35 @@
 #ifndef ARX_NETWORK_SERVER_H
 #define ARX_NETWORK_SERVER_H
 
-class Server;
-
 #include <thread>
 #include <vector>
 #include "network/ClientData.h"
+#include "network/cppsockets/TcpServer.h"
+
+struct Message;
+class ClientData;
 
 class Server {
-  public:
-    Server(int port);
-    void start();
-    void stop();
-    void disconnect(ClientData * client);
-    void broadcast(ClientData * client, MessageType messageType, std::string payload = "");
-    bool isRunning();
+	std::shared_ptr<CppSockets::TcpServer> tcpServer;
+	std::vector<std::shared_ptr<ClientData>> clients;
+	std::mutex serverMutex;
+	int port;
 
-  private:
-    ClientData * findClientByDescriptor(int descriptor);
-    void connectionHandler();
+	void serverAccept(std::shared_ptr<CppSockets::TcpClient> client);
 
-    int m_port;
-    bool m_isRunning;
-    int m_socketDescriptor;
-    std::vector<ClientData *> m_clients;
-    std::thread * m_thread;
+	//no copy and assignment
+	Server(const Server& other) = delete;
+	Server& operator=(const Server&) = delete;
+public:
+	Server(int port);
+	void start();
+	void stop();
+	bool isRunning();
+	void handleClientMessage(ClientData* sender, uint16_t messageType, std::vector<unsigned char>& buffer);
+	void broadcast(uint32_t sender, uint16_t messageType);
+	void broadcast(uint32_t sender, MessageType messageType);
+	void broadcast(uint32_t sender, uint16_t messageType, std::vector<unsigned char>& buffer);
+	void broadcast(uint32_t sender, MessageType messageType, Message* message);
 };
 
 #endif // ARX_NETWORK_SERVER_H

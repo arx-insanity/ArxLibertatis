@@ -146,6 +146,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "network/common.h"
 #include "network/Server.h"
+#include "network/messages/LevelChange.h"
 
 #include "physics/Collisions.h"
 #include "physics/Projectile.h"
@@ -1154,7 +1155,8 @@ extern Server * g_server;
 
 void DANAE_StartNewQuest() {
 	if (g_server != nullptr && g_server->isRunning()) {
-		g_server->broadcast(nullptr, MessageTypeChangeLevel, "1");
+		LevelChange msg(1);
+		g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
 	}
 	benchmark::begin(benchmark::LoadLevel);
 	player.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;

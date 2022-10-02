@@ -1,108 +1,98 @@
-#include <sys/socket.h>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/erase.hpp>
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/ClientData.h"
+#include "network/messages/Handshake.h"
 
-ClientData::ClientData(int descriptor, Server * server) {
-  this->m_clientDescriptor = descriptor;
-  this->m_nickname = "client #" + std::to_string(descriptor);
-  this->m_entity = nullptr;
-  this->m_server = server;
-  this->m_isQuitting = false;
+ClientData::ClientData(Server* server, std::shared_ptr<CppSockets::TcpClient> client)
+	:server(server), client(client), nickname("unnamed"), readerThread(NULL), readerRunning(false) {
 }
 
-int ClientData::getDescriptor() {
-  return this->m_clientDescriptor;
+ClientData::~ClientData() {
+	//TODO: in theory we should thread safely stop the reader here, but thats complicated with sync, so skipping for now
 }
 
 std::string ClientData::getNickname() {
-  return this->m_nickname;
+	return nickname;
 }
 
-void ClientData::write(MessageType messageType, std::string payload) {
-  ::write(this->m_clientDescriptor, (char *)&messageType, sizeof(messageType));
-
-  if (payload != "") {
-    ::write(this->m_clientDescriptor, payload.c_str(), payload.size());
-  }
+std::shared_ptr<CppSockets::TcpClient> ClientData::getClient() {
+	return client;
 }
 
-std::string ClientData::read() {
-  /*
-  char rawInput[2000];
-  int rawReadSize = ::read(this->m_clientDescriptor, rawInput, 2000);
-
-  if (rawReadSize == 0) {
-    return "/quit";
-  }
-
-  // TODO: error handling
-  if (rawReadSize < 0) {
-    // failed to read
-  }
-
-  std::string input(rawInput, rawReadSize);
-  boost::trim(input);
-
-  return input;
-  */
-
-  return "";
+Server* ClientData::getServer() {
+	return server;
 }
 
-void ClientData::listen() {
-  this->m_thread = new std::thread(&ClientData::connectionHandler, this);
+void ClientData::startReading() {
+	this->readerThread = std::make_shared<std::thread>(&ClientData::readerLoop, this);
 }
 
-void ClientData::stopListening() {
-  this->m_isQuitting = true;
-  this->m_thread->join();
+void ClientData::readerLoop() {
+	const uint32_t bufferSize = 1024;
+	std::vector<unsigned char> buffer;
+	unsigned char constBuffer[bufferSize];
+	while (this->readerRunning) {
+		//read frame header
+		if (!client->receiveFixedData<sizeof(FrameHeader)>(constBuffer)) {
+			break; //closed
+		}
+		FrameHeader frameHeader = *reinterpret_cast<FrameHeader*>(constBuffer);
+		//read message body into buffer
+		uint32_t left = frameHeader.length;
+		while (left > 0) {
+			int received = client->receiveData(constBuffer, std::min(bufferSize, left));
+			if (received == 0) {
+				goto exitReaderLoop; //closed
+			}
+			left -= received;
+			size_t writePos = buffer.size();
+			buffer.resize(writePos + received);
+			memcpy(&buffer[writePos], constBuffer, received);
+		}
+		//TODO: move the name assignment to server
+		if (frameHeader.messageType == static_cast<uint16_t>(MessageType::Handshake)) {
+			Handshake hs;
+			hs.read(buffer.data(), buffer.size());
+			{
+				LOCK_GUARD(clientMutex);
+				this->nickname = hs.getName();
+			}
+		}
+		server->handleClientMessage(this, frameHeader.messageType, buffer);
+		buffer.clear();
+	}
+exitReaderLoop:
+	{
+		LOCK_GUARD(clientMutex);
+		readerRunning = false;
+	}
 }
 
-void ClientData::connectionHandler() {
-  /*
-  LogInfo << "client #" << std::to_string(this->m_clientDescriptor) << " connected";
-  this->write("connected, welcome to Arx!");
+void ClientData::stopReading() {
+	{
+		LOCK_GUARD(clientMutex);
+		if (!readerRunning) {
+			return;
+		}
+	}
+	{
+		LOCK_GUARD(clientMutex);
+		readerRunning = false;
+		client->close();
+	}
+	readerThread->join();
+	{
+		LOCK_GUARD(clientMutex);
+		readerThread = NULL;
+	}
+}
 
-  this->m_server->broadcast(this, "joined");
-
-  do {
-    std::string input = this->read();
-
-    LogInfo << "--- ClientData: got message from client '" << input << "'";
-
-    if (!input.empty()) {
-      if (boost::starts_with(input, "/")) {
-        std::string::size_type commandSize = input.find(" ", 0);
-        std::string command = input.substr(1, commandSize - 1);
-        std::string args = boost::trim_copy(boost::erase_head_copy(input, commandSize));
-
-        if (command == "exit" || command == "quit") {
-          this->write("disconnected, goodbye!");
-          this->m_isQuitting = true;
-        } else if (command == "say") {
-          if (args != "") {
-            this->m_server->broadcast(this, "say", args);
-          }
-        } else if (command == "make-host") {
-          this->m_server->broadcast(this, "make-host", args);
-        } else if (command == "nickname") {
-          if (args != "") {
-            this->m_nickname = args;
-          }
-        }
-      }
-    }
-  } while (!this->m_isQuitting);
-  
-  if (this->m_isQuitting) {
-    fflush(stdout);
-  }
-
-  LogInfo << "client #" << std::to_string(this->m_clientDescriptor) << " disconnected";
-  this->m_server->disconnect(this);
-  */
+void ClientData::sendMessage(FrameHeader header, unsigned char* body, uint32_t bodyLength) {
+	client->sendData(&header, sizeof(header));
+	if (body != NULL && bodyLength > 0) {
+		client->sendData(body, bodyLength);
+	}
 }

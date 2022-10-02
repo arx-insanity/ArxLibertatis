@@ -13,7 +13,9 @@
 #ifdef _WIN32
 // Windows
 #pragma comment(lib,"ws2_32.lib")
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #undef TEXT
 #include <Windows.h>
 #include <winsock2.h>

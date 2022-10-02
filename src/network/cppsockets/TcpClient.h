@@ -1,6 +1,7 @@
 #pragma once
 
 #include "network/cppsockets/Socket.h"
+#include <cstring>
 
 namespace CppSockets {
 	class TcpClient : public Socket {
@@ -62,6 +63,22 @@ namespace CppSockets {
 		int receiveData(void* buf, int len)
 		{
 			return recv(_sock, (char*)buf, len, 0);
+		}
+
+		template<int size> bool receiveFixedData(void* buf) {
+			int left = size;
+			unsigned char localBuf[size];
+			unsigned char* writePtr = localBuf;
+			while (left > 0) {
+				int received = receiveData(writePtr, left);
+				if (received == 0) {
+					return false;
+				}
+				left -= received;
+				writePtr += received;
+			}
+			std::memcpy(buf, localBuf, size);
+			return true;
 		}
 	};
 }
