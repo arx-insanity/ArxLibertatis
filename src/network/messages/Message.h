@@ -13,9 +13,11 @@ protected:
 	static void write(const std::string& str, std::vector<unsigned char>& buffer) {
 		size_t len = str.length();
 		write<size_t>(len, buffer);
-		size_t writePos = buffer.size();
-		buffer.resize(buffer.size() + len);
-		std::memcpy(&buffer[writePos], str.c_str(), len);
+		if (len > 0) {
+			size_t writePos = buffer.size();
+			buffer.resize(buffer.size() + len);
+			std::memcpy(&buffer[writePos], str.c_str(), len);
+		}
 	}
 
 	static std::string readString(const unsigned char*& buffer) {
