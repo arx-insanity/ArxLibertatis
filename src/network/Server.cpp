@@ -46,7 +46,7 @@ void Server::serverAccept(std::shared_ptr<CppSockets::TcpClient> client) {
 
 
 bool Server::isRunning() {
-	return this->tcpServer->isListening();
+	return tcpServer != NULL && tcpServer->isListening();
 }
 
 void Server::broadcast(uint32_t sender, uint16_t messageType) {
