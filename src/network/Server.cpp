@@ -16,11 +16,15 @@ void Server::start() {
 	}
 
 	LogInfo << "Server starting...";
-
+	LogInfo << "Sockets Init";
 	CppSockets::cppSocketsInit();
+	LogInfo << "Create Tcp Server";
 	tcpServer = std::make_shared<CppSockets::TcpServer>(port);
+	LogInfo << "Set Accept Callback";
 	tcpServer->acceptCallback = std::bind(std::mem_fn(&Server::serverAccept), this, std::placeholders::_1);
+	LogInfo << "Start Listening";
 	tcpServer->startListening();
+	LogInfo << "Server Started";
 }
 
 void Server::stop() {
