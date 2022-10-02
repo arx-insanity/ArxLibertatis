@@ -48,6 +48,7 @@ void Server::serverAccept(std::shared_ptr<CppSockets::TcpClient> client) {
 	LogInfo << "Client Connecting...";
 	LOCK_GUARD(serverMutex);
 	std::shared_ptr<ClientData> cd = std::make_shared<ClientData>(this, client);
+	cd->startReading();
 	clients.push_back(cd);
 }
 
