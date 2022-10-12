@@ -1,79 +1,93 @@
 #include "network/cppsockets/CppSocketsUtil.h"
+#include "platform/Platform.h"
 
 namespace CppSockets {
 
-#ifdef _WIN32
-	void handleWinapiError(int error) {
-#ifdef CPPSOCKETS_DEBUG
-		LPSTR errorMessagePtr = NULL;
-		FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (LPTSTR)&errorMessagePtr, 0, NULL);
-		if (errorMessagePtr) {
-			CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
-			LocalFree(errorMessagePtr);
-		}
-		else {
-			CPPSOCKETS_DEBUG_PRINT_ERROR("didnt managed to format winapi error %d\n", error);
-		}
-#endif
-	}
+	#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+		void handleWinapiError(int error) {
+			#ifdef CPPSOCKETS_DEBUG
+				LPSTR errorMessagePtr = NULL;
+				FormatMessage(
+					FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+					NULL,
+					error,
+					MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
+					(LPTSTR)&errorMessagePtr,
+					0,
+					NULL
+				);
 
-	bool _cppsockets_initWinsockSuccess = false;
-	bool initWinsock() {
-		if (_cppsockets_initWinsockSuccess) {
-			return true;
+				if (errorMessagePtr) {
+					CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
+					LocalFree(errorMessagePtr);
+				} else {
+					CPPSOCKETS_DEBUG_PRINT_ERROR("didnt managed to format winapi error %d\n", error);
+				}
+			#endif
 		}
-		WSADATA wsaData;
-		int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-		if (result != 0) {
-			handleWinapiError(result);
-			return false;
-		}
-		_cppsockets_initWinsockSuccess = true;
-		return true;
-	}
 
-	bool cleanupWinsock() {
-		if (_cppsockets_initWinsockSuccess) {
-			_cppsockets_initWinsockSuccess = false;
-			int result = WSACleanup();
+		bool _cppsockets_initWinsockSuccess = false;
+
+		bool initWinsock() {
+			if (_cppsockets_initWinsockSuccess) {
+				return true;
+			}
+
+			WSADATA wsaData;
+
+			int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
 			if (result != 0) {
 				handleWinapiError(result);
 				return false;
 			}
+
+			_cppsockets_initWinsockSuccess = true;
+
+			return true;
 		}
-		return true;
-	}
-#endif
+
+		bool cleanupWinsock() {
+			if (_cppsockets_initWinsockSuccess) {
+				_cppsockets_initWinsockSuccess = false;
+				int result = WSACleanup();
+				if (result != 0) {
+					handleWinapiError(result);
+					return false;
+				}
+			}
+
+			return true;
+		}
+	#endif
 
 	void cppSocketsInit() {
-#ifdef _WIN32
-		if (!initWinsock()) {
-			//honestly no idea
-		}
-#endif
+		#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+			if (!initWinsock()) {
+				//honestly no idea
+			}
+		#endif
 	}
 
 	void cppSocketsDeinit() {
-#ifdef _WIN32
-		if (!cleanupWinsock()) {
-			//honestly no idea
-		}
-#endif
+		#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+			if (!cleanupWinsock()) {
+				//honestly no idea
+			}
+		#endif
 	}
 
-	void inetPton(const char* host, struct sockaddr_in& saddr_in)
-	{
-#ifdef _WIN32
-#ifdef UNICODE
-		WCHAR host_[64];
-		swprintf_s(host_, L"%S", host);
-#else
-		const char* host_ = host;
-#endif
-		InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
-#else
-		inet_pton(AF_INET, host, &(saddr_in.sin_addr));
-#endif
+	void inetPton(const char* host, struct sockaddr_in& saddr_in) {
+		#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+			#ifdef UNICODE
+				WCHAR host_[64];
+				swprintf_s(host_, L"%S", host);
+			#else
+				const char* host_ = host;
+			#endif
+			InetPton(AF_INET, host_, &(saddr_in.sin_addr.s_addr));
+		#else
+			inet_pton(AF_INET, host, &(saddr_in.sin_addr));
+		#endif
 	}
 
 	void printHex(const char* bytes, size_t len) {

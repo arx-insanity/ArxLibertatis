@@ -1,6 +1,8 @@
 #ifndef NETWORK_CPPSOCKETS_CPPSOCKETSUTIL_H
 #define NETWORK_CPPSOCKETS_CPPSOCKETSUTIL_H
 
+#include "platform/Platform.h"
+
 #define CPPSOCKETS_DEBUG
 
 #ifdef CPPSOCKETS_DEBUG
@@ -11,11 +13,10 @@
 	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)
 #endif
 
-#ifdef _WIN32
-	// Windows
-	#pragma comment(lib,"ws2_32.lib")
+#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+	#pragma comment(lib, "ws2_32.lib")
 	#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN
 	#endif
 	#undef TEXT
 	#include <Windows.h>
@@ -23,7 +24,6 @@
 	#include <ws2tcpip.h>
 	typedef SOCKET socket_t;
 #else
-	// Linux
 	#define sprintf_s sprintf
 	typedef int socket_t;
 	#include <sys/types.h>
@@ -45,13 +45,14 @@
 
 namespace CppSockets {
 
-#ifdef _WIN32
-	void handleWinapiError(int error);
+	#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+		void handleWinapiError(int error);
 
-	bool initWinsock();
+		bool initWinsock();
 
-	bool cleanupWinsock();
-#endif
+		bool cleanupWinsock();
+	#endif
+
 	void cppSocketsInit();
 
 	void cppSocketsDeinit();
@@ -59,5 +60,7 @@ namespace CppSockets {
 	void inetPton(const char* host, struct sockaddr_in& saddr_in);
 
 	void printHex(const char* bytes, size_t len);
+
 }
+
 #endif // NETWORK_CPPSOCKETS_CPPSOCKETSUTIL_H
