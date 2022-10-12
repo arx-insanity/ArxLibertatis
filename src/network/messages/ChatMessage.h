@@ -8,9 +8,7 @@ struct ChatMessage : public Message {
 
 	ChatMessage() {}
 
-	ChatMessage(std::string sender, std::string message) : sender(sender), message(message) {
-
-	}
+	ChatMessage(std::string sender, std::string message) : sender(sender), message(message) {}
 
 	virtual void send(std::vector<unsigned char>& buffer) {
 		write(sender, buffer);

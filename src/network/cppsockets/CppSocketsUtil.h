@@ -4,36 +4,35 @@
 #define CPPSOCKETS_DEBUG
 
 #ifdef CPPSOCKETS_DEBUG
-#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
-#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
+	#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
+	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
 #else
-#define CPPSOCKETS_DEBUG_PRINT(...)
-#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)
+	#define CPPSOCKETS_DEBUG_PRINT(...)
+	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)
 #endif
 
 #ifdef _WIN32
-// Windows
-#pragma comment(lib,"ws2_32.lib")
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#undef TEXT
-#include <Windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-typedef SOCKET socket_t;
-
+	// Windows
+	#pragma comment(lib,"ws2_32.lib")
+	#ifndef WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN
+	#endif
+	#undef TEXT
+	#include <Windows.h>
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+	typedef SOCKET socket_t;
 #else
-// Linux
-#define sprintf_s sprintf
-typedef int socket_t;
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-static const socket_t INVALID_SOCKET = ~0;
-static const int SOCKET_ERROR = -1;
+	// Linux
+	#define sprintf_s sprintf
+	typedef int socket_t;
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <netdb.h>
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	static const socket_t INVALID_SOCKET = ~0;
+	static const int SOCKET_ERROR = -1;
 #endif
 
 #include <stdio.h>
@@ -53,7 +52,6 @@ namespace CppSockets {
 
 	bool cleanupWinsock();
 #endif
-
 	void cppSocketsInit();
 
 	void cppSocketsDeinit();

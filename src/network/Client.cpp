@@ -95,31 +95,31 @@ bool Client::isConnected() {
 	return this->readerRunning;
 }
 
-void  Client::sendMessage(FrameHeader header, unsigned char* body) {
+void Client::sendMessage(FrameHeader header, unsigned char* body) {
 	client->sendData(&header, sizeof(header));
 	if (header.length > 0 && body != NULL) {
 		client->sendData(body, header.length);
 	}
 }
-void  Client::sendMessage(uint16_t messageType) {
+void Client::sendMessage(uint16_t messageType) {
 	FrameHeader fh;
 	fh.length = 0;
 	fh.messageType = messageType;
 	fh.sender = id;
 	sendMessage(fh, NULL);
 }
-void  Client::sendMessage(MessageType messageType) {
+void Client::sendMessage(MessageType messageType) {
 	sendMessage(static_cast<uint16_t>(messageType));
-
 }
-void  Client::sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer) {
+
+void Client::sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer) {
 	FrameHeader fh;
 	fh.length = buffer.size();
 	fh.messageType = messageType;
 	fh.sender = id;
 	sendMessage(fh, buffer.data());
 }
-void  Client::sendMessage(MessageType messageType, Message* message) {
+void Client::sendMessage(MessageType messageType, Message* message) {
 	std::vector<unsigned char> buffer;
 	message->send(buffer);
 	sendMessage(static_cast<uint16_t>(messageType), buffer);

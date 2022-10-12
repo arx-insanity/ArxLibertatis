@@ -30,6 +30,6 @@ namespace CppSockets {
 			}
 		}
 	};
-
 }
+
 #endif // NETWORK_CPPSOCKETS_SOCKET_H

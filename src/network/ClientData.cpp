@@ -11,7 +11,7 @@ ClientData::ClientData(Server* server, std::shared_ptr<CppSockets::TcpClient> cl
 }
 
 ClientData::~ClientData() {
-	//TODO: in theory we should thread safely stop the reader here, but thats complicated with sync, so skipping for now
+	// TODO: in theory we should thread safely stop the reader here, but thats complicated with sync, so skipping for now
 }
 
 std::string ClientData::getNickname() {

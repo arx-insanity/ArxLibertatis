@@ -7,9 +7,7 @@ struct LevelChange : public Message {
 
 	LevelChange():level(0) {}
 
-	LevelChange(long level) : level(level) {
-
-	}
+	LevelChange(long level) : level(level) {}
 
 	virtual void send(std::vector<unsigned char>& buffer) {
 		write<long>(level, buffer);

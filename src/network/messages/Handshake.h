@@ -8,10 +8,10 @@ public:
 	virtual ~Handshake() {
 
 	}
-	Handshake() {}
-	Handshake(std::string name) : name(name) {
 
-	}
+	Handshake() {}
+
+	Handshake(std::string name) : name(name) {}
 
 	std::string getName() {
 		return name;

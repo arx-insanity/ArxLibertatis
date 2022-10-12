@@ -60,7 +60,6 @@ namespace CppSockets {
 			return send(_sock, (const char*)buf, len, 0);
 		}
 
-
 		int receiveData(void* buf, int len)
 		{
 			return recv(_sock, (char*)buf, len, 0);
