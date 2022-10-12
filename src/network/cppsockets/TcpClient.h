@@ -2,6 +2,7 @@
 #define NETWORK_CPPSOCKETS_TCPCLIENT_H
 
 #include "network/cppsockets/Socket.h"
+#include "io/log/Logger.h"
 #include <cstring>
 
 namespace CppSockets {

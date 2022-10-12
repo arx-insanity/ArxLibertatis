@@ -4,6 +4,8 @@
 #include "network/cppsockets/TcpClient.h"
 #include "network/cppsockets/Socket.h"
 #include "network/cppsockets/CppSocketsUtil.h"
+#include "platform/Platform.h"
+#include "io/log/Logger.h"
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -60,7 +62,7 @@ namespace CppSockets {
 			addrinfo* _addressInfo = NULL;
 			int result = getaddrinfo(NULL, _port, &hints, &_addressInfo);
 			if (result != 0) {
-#ifdef _WIN32
+#if ARX_PLATFORM == ARX_PLATFORM_WIN32
 				handleWinapiError(result);
 #else
 				CPPSOCKETS_DEBUG_PRINT_ERROR("getaddrinfo() failed with error: %d", result);
@@ -118,25 +120,26 @@ namespace CppSockets {
 	private:
 		void listenLoop() {
 			struct timeval timeout;
-			timeout.tv_sec = 0;  // 1s timeout
-			timeout.tv_usec = 100000;
+			timeout.tv_sec = 1;  // 1s timeout
+			timeout.tv_usec = 0;
 
 			fd_set read_fds;
 			while (listenerRunning) {
 				FD_ZERO(&read_fds);
 				FD_SET(_sock, &read_fds);
 				//accept doesnt have a timeout, use select to check if new connections are available
-				int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
-				if (select_status == -1) {
-					// ERROR: do something
-					#ifdef _WIN32
-						CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
-					#else
-						CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed");
-					#endif
-					break;
-				}
-				else if (select_status > 0) {
+				// int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
+				// LogInfo << "--------------" << select_status;
+				// if (select_status == -1) {
+				// 	// ERROR: do something
+				// 	#ifdef _WIN32
+				// 		CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
+				// 	#else
+				// 		CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed");
+				// 	#endif
+				// 	break;
+				// }
+				// else if (select_status > 0) {
 					socket_t _conn = accept(_sock, (struct sockaddr*)NULL, NULL);
 					if (_conn == SOCKET_ERROR) {
 						CPPSOCKETS_DEBUG_PRINT_ERROR("accept() failed");
@@ -150,7 +153,7 @@ namespace CppSockets {
 					else {
 						client->close(); //prevent leak i guess?
 					}
-				}
+				// }
 			}
 		}
 	};
