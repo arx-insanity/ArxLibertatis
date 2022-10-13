@@ -78,6 +78,23 @@ namespace CppSockets {
 				return;
 			}
 
+#if ARX_PLATFORM == ARX_PLATFORM_WIN32
+			u_long mode = 1; //0 for blocking, 1 for non blocking
+			result = ioctlsocket(_sock, FIONBIO, &mode);
+			if (result != NO_ERROR) {
+				CPPSOCKETS_DEBUG_PRINT_ERROR("ioctlsocket failed with error: %ld\n", result);
+			}
+#else
+			int flags = fcntl(_sock, F_GETFL, 0);
+			if (flags == -1) {
+				CPPSOCKETS_DEBUG_PRINT_ERROR("fcntl failed to get flags");
+			}
+			flags |= O_NONBLOCK;
+			if (fcntl(_sock, F_SETFL, flags) != 0) {
+				CPPSOCKETS_DEBUG_PRINT_ERROR("fcntl failed to set flags");
+			}
+#endif
+
 			// Setup the TCP listening socket
 			result = bind(_sock, _addressInfo->ai_addr, (int)_addressInfo->ai_addrlen);
 			if (result == SOCKET_ERROR) {
@@ -119,6 +136,7 @@ namespace CppSockets {
 
 	private:
 		void listenLoop() {
+#if ARX_PLATFORM == ARX_PLATFORM_WIN32
 			struct timeval timeout;
 			timeout.tv_sec = 1;  // 1s timeout
 			timeout.tv_usec = 0;
@@ -128,33 +146,60 @@ namespace CppSockets {
 				FD_ZERO(&read_fds);
 				FD_SET(_sock, &read_fds);
 				//accept doesnt have a timeout, use select to check if new connections are available
-				// int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
-				// LogInfo << "--------------" << select_status;
-				// if (select_status == -1) {
-				// 	// ERROR: do something
-				// 	#ifdef _WIN32
-				// 		CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
-				// 	#else
-				// 		CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed");
-				// 	#endif
-				// 	break;
-				// }
-				// else if (select_status > 0) {
+				int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
+				if (select_status == -1) {
+					// ERROR: do something
+					CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
+					break;
+				}
+				else if (select_status > 0) {
 					socket_t _conn = accept(_sock, (struct sockaddr*)NULL, NULL);
-					if (_conn == SOCKET_ERROR) {
+					if (_conn == INVALID_SOCKET) {
 						CPPSOCKETS_DEBUG_PRINT_ERROR("accept() failed");
 						break;
 					}
 					std::shared_ptr<TcpClient> client = std::make_shared<TcpClient>(_conn);
-					//TODO: call function with client
+					// call function with client
 					if (acceptCallback) {
 						acceptCallback(client);
 					}
 					else {
 						client->close(); //prevent leak i guess?
 					}
-				// }
+				}
 			}
+#else
+			pollfd pollfds[1];
+			pollfds[0].fd = _sock;
+			while (listenerRunning) {
+				pollfds[0].revents = 0;
+				pollfds[0].events = POLLIN;
+
+				if (poll(&pollfds, 1, 1) < 0) {
+					CPPSOCKETS_DEBUG_PRINT_ERROR("poll() failed");
+				}
+
+				/* Handle an incoming connection. */
+				if (pollfds[0].revents & POLLERR) {
+					CPPSOCKETS_DEBUG_PRINT_ERROR("server failed");
+					break;
+				}
+				else if (pollfds[0].revents & POLLIN) {
+					socket_t _conn = accept(_sock, (struct sockaddr*)NULL, NULL);
+					if (_conn < 0) {
+						CPPSOCKETS_DEBUG_PRINT_ERROR("accept() failed");
+						break;
+					}
+					std::shared_ptr<TcpClient> client = std::make_shared<TcpClient>(_conn);
+					//call function with client
+					if (acceptCallback) {
+						acceptCallback(client);
+					}
+					else {
+						client->close(); //prevent leak i guess?
+					}
+				}
+#endif
 		}
 	};
 }
