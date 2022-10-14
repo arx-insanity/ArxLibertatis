@@ -606,11 +606,20 @@ static void startAsServer(const std::string & rawPort) {
 ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
 
 static void startAsClient(const std::string & rawTarget) {
-	// TODO: parse target as ip + ":" + port
-	std::string ip = "127.0.0.1";
-	long port = 8888;
+	size_t colon = rawTarget.find(':');
+	if (colon == std::string::npos) {
+		LogWarning << "could not parse server address and port. missing colon. has to be in format <host>:<port>, found '" << rawTarget << "'";
+		return;
+	}
+	std::string ipString = rawTarget.substr(0, colon);
+	std::string portString = rawTarget.substr(colon + 1);
+	long longPort = std::stoul(portString);
+	if (longPort < 1 || longPort > 0xffff) {
+		LogWarning << "server port is out of range: " << portString;
+	}
+	unsigned short port = static_cast<unsigned short>(longPort);
 
-	g_client = new Client(ip, port);
+	g_client = new Client(ipString, port);
 
 	// TODO: move this somewhere else, create the client later
 	if (g_client != nullptr && !g_client->isConnected()) {
