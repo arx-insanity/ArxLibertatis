@@ -179,7 +179,7 @@ namespace CppSockets {
 				pollfds[0].revents = 0;
 				pollfds[0].events = POLLIN;
 
-				if (poll(&pollfds, 1, 1) < 0) {
+				if (poll(pollfds, 1, 1) < 0) {
 					CPPSOCKETS_DEBUG_PRINT_ERROR("poll() failed");
 				}
 
