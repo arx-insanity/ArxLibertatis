@@ -16,6 +16,7 @@
 #include <iomanip>
 #if ARX_PLATFORM != ARX_PLATFORM_WIN32
 #include <fcntl.h>
+#include <poll.h>
 #endif
 
 namespace CppSockets {
