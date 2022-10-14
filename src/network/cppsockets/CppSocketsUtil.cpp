@@ -21,7 +21,7 @@ namespace CppSockets {
 					CPPSOCKETS_DEBUG_PRINT_ERROR(errorMessagePtr);
 					LocalFree(errorMessagePtr);
 				} else {
-					CPPSOCKETS_DEBUG_PRINT_ERROR("didnt managed to format winapi error %d\n", error);
+					CPPSOCKETS_DEBUG_PRINT_ERROR("didnt managed to format winapi error " << error);
 				}
 			#endif
 		}

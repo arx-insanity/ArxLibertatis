@@ -29,6 +29,8 @@ namespace CppSockets {
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
+			CPPSOCKETS_DEBUG_PRINT("trying to connect to " << host << _port);
+
 			// Resolve the server address and port, returning on failure
 			addrinfo* _addressInfo = NULL;
 			int result = getaddrinfo(host, _port, &hints, &_addressInfo);
@@ -41,6 +43,8 @@ namespace CppSockets {
 				return;
 			}
 
+			CPPSOCKETS_DEBUG_PRINT("creating socket");
+
 			// Create a SOCKET for connecting to server, returning on failure
 			_sock = socket(_addressInfo->ai_family, _addressInfo->ai_socktype, _addressInfo->ai_protocol);
 			if (_sock == INVALID_SOCKET) {
@@ -49,11 +53,16 @@ namespace CppSockets {
 				return;
 			}
 
+			CPPSOCKETS_DEBUG_PRINT("connecting socket");
+
 			result = connect(_sock, _addressInfo->ai_addr, (int)_addressInfo->ai_addrlen);
 			if (result == SOCKET_ERROR) {
+				CPPSOCKETS_DEBUG_PRINT_ERROR("connect() failed");
 				close();
 			}
 			freeaddrinfo(_addressInfo);
+
+			CPPSOCKETS_DEBUG_PRINT("finished creating tcp client");
 		}
 
 		int sendData(const void* buf, int len)

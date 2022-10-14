@@ -86,7 +86,7 @@ namespace CppSockets {
 			u_long mode = 1; //0 for blocking, 1 for non blocking
 			result = ioctlsocket(_sock, FIONBIO, &mode);
 			if (result != NO_ERROR) {
-				CPPSOCKETS_DEBUG_PRINT_ERROR("ioctlsocket failed with error: %ld\n", result);
+				CPPSOCKETS_DEBUG_PRINT_ERROR("ioctlsocket failed with error: " << result);
 			}
 #else
 			int flags = fcntl(_sock, F_GETFL, 0);
@@ -153,7 +153,7 @@ namespace CppSockets {
 				int select_status = select(NULL, &read_fds, NULL, NULL, &timeout); //0 if timeout
 				if (select_status == -1) {
 					// ERROR: do something
-					CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed %d", WSAGetLastError());
+					CPPSOCKETS_DEBUG_PRINT_ERROR("select() failed " << WSAGetLastError());
 					break;
 				}
 				else if (select_status > 0) {

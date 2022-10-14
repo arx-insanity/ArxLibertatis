@@ -6,8 +6,12 @@
 #define CPPSOCKETS_DEBUG
 
 #ifdef CPPSOCKETS_DEBUG
-	#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
-	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
+	#include <iostream>
+	#include <fstream>
+	//#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
+	//#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
+	#define CPPSOCKETS_DEBUG_PRINT(...) { LogInfo<< __VA_ARGS__; std::ofstream ___file; ___file.open("cppinfo.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
+	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) { LogError<< __VA_ARGS__; std::ofstream ___file; ___file.open("cpperr.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
 #else
 	#define CPPSOCKETS_DEBUG_PRINT(...)
 	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)
