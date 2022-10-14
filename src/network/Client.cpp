@@ -9,7 +9,7 @@
 #include "network/messages/LevelChange.h"
 #include "network/messages/Handshake.h"
 
-Client::Client(std::string ip, int port) : ip(ip), port(port), readerRunning(false) {
+Client::Client(std::string ip, unsigned short port) : ip(ip), port(port), readerRunning(false) {
 	id = rand();
 }
 

@@ -9,7 +9,7 @@
 class Client {
 	uint32_t id;
 	std::string ip;
-	int port;
+	unsigned short port;
 	std::shared_ptr<CppSockets::TcpClient> client;
 	std::shared_ptr<std::thread> readerThread;
 	//std::string nickname;
@@ -23,7 +23,7 @@ class Client {
 	Client(const Client& other) = delete;
 	Client& operator=(const Client&) = delete;
   public:
-    Client(std::string ip, int port);
+    Client(std::string ip, unsigned short port);
     void connect();
     void disconnect();
     bool isConnected();
