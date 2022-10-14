@@ -14,6 +14,8 @@ Client::Client(std::string ip, int port) : ip(ip), port(port), readerRunning(fal
 }
 
 void Client::readerLoop() {
+	this->readerRunning = true;
+
 	const uint32_t bufferSize = 1024;
 	std::vector<unsigned char> buffer;
 	unsigned char constBuffer[bufferSize];

@@ -39,6 +39,8 @@ void ClientData::startReading() {
 }
 
 void ClientData::readerLoop() {
+	this->readerRunning = true;
+
 	const uint32_t bufferSize = 1024;
 	std::vector<unsigned char> buffer;
 	unsigned char constBuffer[bufferSize];
