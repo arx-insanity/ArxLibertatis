@@ -199,6 +199,7 @@ namespace CppSockets {
 						client->close(); //prevent leak i guess?
 					}
 				}
+			}
 #endif
 		}
 	};
