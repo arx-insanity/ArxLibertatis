@@ -8,10 +8,11 @@
 #ifdef CPPSOCKETS_DEBUG
 	#include <iostream>
 	#include <fstream>
+	#include "io/log/Logger.h"
 	//#define CPPSOCKETS_DEBUG_PRINT(...) fprintf(stdout, __VA_ARGS__)
 	//#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) fprintf(stderr, __VA_ARGS__)
-	#define CPPSOCKETS_DEBUG_PRINT(...) { LogInfo<< __VA_ARGS__; std::ofstream ___file; ___file.open("cppinfo.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
-	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) { LogError<< __VA_ARGS__; std::ofstream ___file; ___file.open("cpperr.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
+	#define CPPSOCKETS_DEBUG_PRINT(...) { LogInfo<< __VA_ARGS__ ; std::ofstream ___file; ___file.open("cppinfo.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
+	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...) { LogError<< __VA_ARGS__ ; std::ofstream ___file; ___file.open("cpperr.txt",std::ios_base::app); ___file << __VA_ARGS__ << std::endl;___file.close();}
 #else
 	#define CPPSOCKETS_DEBUG_PRINT(...)
 	#define CPPSOCKETS_DEBUG_PRINT_ERROR(...)

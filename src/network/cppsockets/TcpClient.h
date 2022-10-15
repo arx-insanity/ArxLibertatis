@@ -38,7 +38,7 @@ namespace CppSockets {
 #ifdef _WIN32
 				handleWinapiError(result);
 #else
-				CPPSOCKETS_DEBUG_PRINT_ERROR("getaddrinfo() failed with error: %d", result);
+				CPPSOCKETS_DEBUG_PRINT_ERROR("getaddrinfo() failed with error: " << result);
 #endif
 				return;
 			}
