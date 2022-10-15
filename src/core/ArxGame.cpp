@@ -591,8 +591,8 @@ ARX_PROGRAM_OPTION_ARG("loadsave", "", "Load a specific savegame file", &loadSav
 static void startAsServer(const std::string & rawPort) {
 	long port = strtol(rawPort.c_str(), nullptr, 10);
 
-	if (port < 1000 || port > 65536) {
-		LogError << "Invalid value for --server, expected an integer between 1000 and 65536, got '" << rawPort << "'";
+	if (port < 1 || port > 0xffff) {
+		LogError << "port is out of range, expected an integer between 1 and 65536, got '" << rawPort << "'";
 		return;
 	}
 
@@ -615,7 +615,7 @@ static void startAsClient(const std::string & rawTarget) {
 	std::string portString = rawTarget.substr(colon + 1);
 	long longPort = std::stoul(portString);
 	if (longPort < 1 || longPort > 0xffff) {
-		LogWarning << "server port is out of range: " << portString;
+		LogWarning << "server port is out of range, expected an integer between 1 and 65536, got '" << portString << "'";
 	}
 	unsigned short port = static_cast<unsigned short>(longPort);
 
