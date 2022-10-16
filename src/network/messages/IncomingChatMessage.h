@@ -1,14 +1,14 @@
-#ifndef NETWORK_MESSAGES_CHATMESSAGE_H
-#define NETWORK_MESSAGES_CHATMESSAGE_H
+#ifndef NETWORK_MESSAGES_INCOMINGCHATMESSAGE_H
+#define NETWORK_MESSAGES_INCOMINGCHATMESSAGE_H
 #include "network/messages/Message.h"
 
-struct ChatMessage : public Message {
+struct IncomingChatMessage : public Message {
 	std::string sender;
 	std::string message;
 
-	ChatMessage() {}
+	IncomingChatMessage() {}
 
-	ChatMessage(std::string sender, std::string message) : sender(sender), message(message) {}
+	IncomingChatMessage(std::string sender_, std::string message_) : sender(sender), message(message) {}
 
 	virtual void send(std::vector<unsigned char>& buffer) {
 		write(sender, buffer);
@@ -20,4 +20,4 @@ struct ChatMessage : public Message {
 		message = readString(buffer);
 	}
 };
-#endif // NETWORK_MESSAGES_CHATMESSAGE_H
+#endif // NETWORK_MESSAGES_INCOMINGCHATMESSAGE_H

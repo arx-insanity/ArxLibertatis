@@ -21,7 +21,8 @@ public:
 		write(name, buffer);
 	}
 
-	virtual void read(const unsigned char* buffer, const size_t bufferLen) {
+	virtual void read(const unsigned char* buffer, const size_t _) {
+		ARX_UNUSED(_);
 		name = readString(buffer);
 	}
 };

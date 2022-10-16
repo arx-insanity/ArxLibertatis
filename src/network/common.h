@@ -4,8 +4,6 @@
 #include <string>
 #include <stdint.h>
 
-#define EOL "\n"
-
 enum class MessageType :uint16_t {
 	//Excplicitly listing ids so they cant be accidentally changed
 	Handshake = 1,
@@ -14,11 +12,9 @@ enum class MessageType :uint16_t {
 	AnnounceServerExit = 4,
 	LevelChange = 5,
 	ByeBye = 6,
-	ChatMessage = 7,
-};
-
-struct MessagePayloadChangeLevel {
-	long levelId;
+	OutgoingChatMessage = 7,
+	IncomingChatMessage = 8,
+	HandshakeAnswer = 9,
 };
 
 struct FrameHeader {

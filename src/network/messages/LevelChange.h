@@ -13,7 +13,8 @@ struct LevelChange : public Message {
 		write<long>(level, buffer);
 	}
 
-	virtual void read(const unsigned char* buffer, const size_t bufferLen) {
+	virtual void read(const unsigned char* buffer, const size_t _) {
+		ARX_UNUSED(_);
 		level = Message::read<long>(buffer);
 	}
 };

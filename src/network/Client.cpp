@@ -8,9 +8,10 @@
 #include "network/Client.h"
 #include "network/messages/LevelChange.h"
 #include "network/messages/Handshake.h"
+#include "network/messages/HandshakeAnswer.h"
 
 Client::Client(std::string ip, unsigned short port) : ip(ip), port(port), readerRunning(false) {
-	id = rand();
+	id = ""; //gets set by handshake answer
 }
 
 void Client::readerLoop() {
@@ -86,9 +87,24 @@ void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& 
 		CHANGE_LEVEL_ICON = ChangeLevelNow;
 		break;
 	}
-	case MessageType::ChatMessage:
+	case MessageType::HandshakeAnswer:
+	{
+		HandshakeAnswer msg;
+		msg.read(buffer.data(), buffer.size());
+		id = msg.getId();
+		break;
+	}
+	case MessageType::IncomingChatMessage:
+		//TODO: display chat message
+		break;
+	case MessageType::AnnounceClientEnter:
+		//TODO: add other player to our game
+		break;
+	case MessageType::AnnounceClientExit:
+		//TODO: remove other player from our game
 		break;
 	case MessageType::AnnounceServerExit:
+		//TODO: disconnect
 		break;
 	}
 }

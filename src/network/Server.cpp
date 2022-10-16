@@ -105,7 +105,7 @@ void Server::handleClientMessage(ClientData* sender, MessageType messageType, st
 		broadcast(static_cast<uint16_t>(messageType), buffer);
 		break;
 	}
-	case MessageType::ChatMessage:
+	case MessageType::OutgoingChatMessage:
 		break;
 	case MessageType::AnnounceClientExit:
 		break;

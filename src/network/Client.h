@@ -7,7 +7,7 @@
 #include "network/messages/Message.h"
 
 class Client {
-	uint32_t id;
+	std::string id;
 	std::string ip;
 	unsigned short port;
 	std::shared_ptr<CppSockets::TcpClient> client;
