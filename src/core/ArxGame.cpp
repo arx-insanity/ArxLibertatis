@@ -171,8 +171,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "window/RenderWindow.h"
 
 #include "network/common.h"
-#include "network/Server.h"
-#include "network/Client.h"
 #include "network/messages/LevelChange.h"
 
 #if ARX_HAVE_SDL2
@@ -182,14 +180,14 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "window/SDL1Window.h"
 #endif
 
+Server * g_server = nullptr;
+Client * g_client = nullptr;
+
 InfoPanels g_debugInfo = InfoPanelNone;
 
 extern bool START_NEW_QUEST;
 SavegameHandle LOADQUEST_SLOT = SavegameHandle(); // OH NO, ANOTHER GLOBAL! - TEMP PATCH TO CLEAN CODE FLOW
 static fs::path g_saveToLoad;
-
-extern Server * g_server = nullptr;
-extern Client * g_client = nullptr;
 
 static const PlatformDuration runeDrawPointInterval = 16ms; // ~60fps
 

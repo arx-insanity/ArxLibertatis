@@ -117,6 +117,9 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "math/Rectangle.h"
 #include "math/Vector.h"
 
+#include "network/common.h"
+#include "network/messages/ChangePlayerPosition.h"
+
 #include "physics/Collisions.h"
 #include "physics/Physics.h"
 
@@ -884,6 +887,20 @@ void ArxGame::managePlayerControls() {
 		}
 		
 		g_moveto = player.pos + tm;
+		if (g_previousMoveto.x != g_moveto.x || g_previousMoveto.y != g_moveto.y || g_previousMoveto.z != g_moveto.z) {
+			g_previousMoveto.x = g_moveto.x;
+			g_previousMoveto.y = g_moveto.y;
+			g_previousMoveto.z = g_moveto.z;
+
+			ChangePlayerPosition msg(g_moveto);
+
+			if (g_server != nullptr && g_server->isRunning()) {
+				g_server->broadcast(MessageType::ChangePlayerPosition, &msg);
+			}
+			if (g_client != nullptr && g_client->isConnected()) {
+				g_client->sendMessage(MessageType::ChangePlayerPosition, &msg);
+			}
+		}
 	}
 	
 	// Checks CROUCH Key Status.

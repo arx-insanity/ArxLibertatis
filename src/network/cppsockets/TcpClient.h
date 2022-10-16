@@ -29,7 +29,7 @@ namespace CppSockets {
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
-			CPPSOCKETS_DEBUG_PRINT("trying to connect to " << host << _port);
+			CPPSOCKETS_DEBUG_PRINT("trying to connect to " << host << ":" << _port);
 
 			// Resolve the server address and port, returning on failure
 			addrinfo* _addressInfo = NULL;

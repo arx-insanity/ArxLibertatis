@@ -50,6 +50,9 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "graphics/Renderer.h"
 
+#include "network/Server.h"
+#include "network/Client.h"
+
 #include "window/Window.h"
 
 class ArxGame : public Application, public Window::Listener, public Renderer::Listener {
@@ -134,6 +137,9 @@ extern InfoPanels g_debugInfo;
 extern TextureContainer * enviro;
 
 extern SavegameHandle LOADQUEST_SLOT;
+
+extern Server * g_server;
+extern Client * g_client;
 
 #endif // ARX_CORE_ARXGAME_H
 

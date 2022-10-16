@@ -6,6 +6,7 @@
 #include "network/messages/Message.h"
 #include "network/messages/Handshake.h"
 #include "network/messages/LevelChange.h"
+#include "network/messages/ChangePlayerPosition.h"
 
 Server::Server(int port) :port(port) {
 	LogInfo << "Server constructed";
@@ -109,5 +110,12 @@ void Server::handleClientMessage(ClientData* sender, MessageType messageType, st
 		break;
 	case MessageType::AnnounceClientExit:
 		break;
+	case MessageType::ChangePlayerPosition:
+	{
+		ChangePlayerPosition msg;
+		msg.read(buffer.data(), buffer.size());
+		broadcast(static_cast<uint16_t>(messageType), buffer);
+		break;
+	}
 	}
 }

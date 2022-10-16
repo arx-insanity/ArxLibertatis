@@ -9,6 +9,7 @@
 #include "network/messages/LevelChange.h"
 #include "network/messages/Handshake.h"
 #include "network/messages/HandshakeAnswer.h"
+#include "network/messages/ChangePlayerPosition.h"
 
 Client::Client(std::string ip, unsigned short port) : ip(ip), port(port), readerRunning(false) {
 	id = ""; //gets set by handshake answer
@@ -106,6 +107,14 @@ void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& 
 	case MessageType::AnnounceServerExit:
 		//TODO: disconnect
 		break;
+	case MessageType::ChangePlayerPosition:
+	{
+		ChangePlayerPosition msg;
+		msg.read(buffer.data(), buffer.size());
+		std::string clientId = "?"; // TODO: get the client ID
+		LogInfo << "client " << clientId << " moved to: [" << msg.position.x << ", " << msg.position.y << ", " << msg.position.z << "]";
+		break;
+	}
 	}
 }
 
