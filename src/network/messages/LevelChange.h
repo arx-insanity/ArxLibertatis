@@ -3,19 +3,19 @@
 #include "network/messages/Message.h"
 
 struct LevelChange : public Message {
-	long level;
+	int32_t level;
 
-	LevelChange():level(0) {}
+	LevelChange() :level(0) {}
 
-	LevelChange(long level) : level(level) {}
+	LevelChange(int32_t level) : level(level) {}
 
 	virtual void send(std::vector<unsigned char>& buffer) {
-		write<long>(level, buffer);
+		write<int32_t>(level, buffer);
 	}
 
 	virtual void read(const unsigned char* buffer, const size_t _) {
 		ARX_UNUSED(_);
-		level = Message::read<long>(buffer);
+		level = Message::read<int32_t>(buffer);
 	}
 };
 

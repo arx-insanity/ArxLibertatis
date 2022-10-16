@@ -97,6 +97,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "network/common.h"
 #include "network/Server.h"
+#include "network/Client.h"
 #include "network/messages/LevelChange.h"
 
 #include "physics/Physics.h"
@@ -1375,11 +1376,17 @@ static void ARX_CHANGELEVEL_Pop_Zones_n_Lights(std::string_view buffer) {
 }
 
 extern Server * g_server;
+extern Client* g_client;
 
 static long ARX_CHANGELEVEL_Pop_Level(long num, bool firstTime) {
-	if (g_server != nullptr && g_server->isRunning()) {
+	{
 		LevelChange msg(num);
-		g_server->broadcast(MessageType::LevelChange, &msg);
+		if (g_server != nullptr && g_server->isRunning()) {
+			g_server->broadcast(MessageType::LevelChange, &msg);
+		}
+		if (g_client != nullptr && g_client->isConnected()) {
+			g_client->sendMessage(MessageType::LevelChange, &msg);
+		}
 	}
 
 	LOAD_N_ERASE = false;
