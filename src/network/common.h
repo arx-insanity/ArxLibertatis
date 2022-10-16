@@ -15,6 +15,9 @@ enum class MessageType :uint16_t {
 	OutgoingChatMessage = 7,
 	IncomingChatMessage = 8,
 	HandshakeAnswer = 9,
+	ChangePlayerPosition = 10,
+	ChangePlayerOrientation = 11,
+	TriggerPlayerJump = 12,
 };
 
 
