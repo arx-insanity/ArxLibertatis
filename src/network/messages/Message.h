@@ -3,6 +3,7 @@
 #include "network/cppsockets/TcpClient.h"
 #include <vector>
 #include <cstring>
+#include <stdint.h>
 
 struct Message {
 	virtual ~Message() {};
@@ -11,8 +12,8 @@ struct Message {
 
 protected:
 	static void write(const std::string& str, std::vector<unsigned char>& buffer) {
-		size_t len = str.length();
-		write<size_t>(len, buffer);
+		uint32_t len = str.length();
+		write(len, buffer);
 		if (len > 0) {
 			size_t writePos = buffer.size();
 			buffer.resize(buffer.size() + len);
@@ -21,7 +22,7 @@ protected:
 	}
 
 	static std::string readString(const unsigned char*& buffer) {
-		const size_t len = read<size_t>(buffer);
+		const auto len = read<uint32_t>(buffer);
 		const char* buffer2 = reinterpret_cast<const char*>(buffer);
 		buffer += len;
 		return std::string(buffer2, len); //might give compiler chance to inline this

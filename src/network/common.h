@@ -17,9 +17,14 @@ enum class MessageType :uint16_t {
 	HandshakeAnswer = 9,
 };
 
+
+#pragma pack(push, 1)
+
 struct FrameHeader {
 	uint16_t messageType;
 	uint32_t length;
 };
+
+#pragma pack(pop)
 
 #endif // ARX_NETWORK_COMMON_H

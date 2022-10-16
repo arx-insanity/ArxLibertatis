@@ -58,7 +58,7 @@ void Client::connect() {
 	client = std::make_shared<CppSockets::TcpClient>(ip.c_str(), port);
 	this->readerThread = std::make_shared<std::thread>(&Client::readerLoop, this);
 
-	Handshake msg;
+	Handshake msg("Am Shaegar");
 	this->sendMessage(MessageType::Handshake, &msg);
 
 	LogInfo << "Connected";
