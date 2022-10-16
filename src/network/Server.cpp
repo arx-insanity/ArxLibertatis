@@ -57,9 +57,8 @@ bool Server::isRunning() {
 	return tcpServer != NULL && tcpServer->isListening();
 }
 
-void Server::broadcast(uint32_t sender, uint16_t messageType) {
+void Server::broadcast(uint16_t messageType) {
 	FrameHeader fh;
-	fh.sender = sender;
 	fh.messageType = messageType;
 	fh.length = 0;
 	for (std::shared_ptr<ClientData> client : clients) {
@@ -67,13 +66,12 @@ void Server::broadcast(uint32_t sender, uint16_t messageType) {
 	}
 }
 
-void Server::broadcast(uint32_t sender, MessageType messageType) {
-	broadcast(sender, static_cast<uint16_t>(messageType));
+void Server::broadcast(MessageType messageType) {
+	broadcast(static_cast<uint16_t>(messageType));
 }
 
-void Server::broadcast(uint32_t sender, uint16_t messageType, std::vector<unsigned char>& buffer) {
+void Server::broadcast(uint16_t messageType, std::vector<unsigned char>& buffer) {
 	FrameHeader fh;
-	fh.sender = sender;
 	fh.messageType = messageType;
 	fh.length = buffer.size();
 	for (std::shared_ptr<ClientData> client : clients) {
@@ -81,10 +79,10 @@ void Server::broadcast(uint32_t sender, uint16_t messageType, std::vector<unsign
 	}
 }
 
-void Server::broadcast(uint32_t sender, MessageType messageType, Message* message) {
+void Server::broadcast(MessageType messageType, Message* message) {
 	std::vector<unsigned char> buffer;
 	message->send(buffer);
-	broadcast(sender, static_cast<uint16_t>(messageType), buffer);
+	broadcast(static_cast<uint16_t>(messageType), buffer);
 }
 
 void Server::handleClientMessage(ClientData* sender, MessageType messageType, std::vector<unsigned char>& buffer) {
@@ -100,16 +98,16 @@ void Server::handleClientMessage(ClientData* sender, MessageType messageType, st
 		}
 		break;
 	}
-	case MessageType::ChangeLevel:
+	case MessageType::LevelChange:
 	{
 		LevelChange msg;
 		msg.read(buffer.data(), buffer.size());
-		broadcast(sender->getId(), static_cast<uint16_t>(messageType), buffer);
+		broadcast(static_cast<uint16_t>(messageType), buffer);
 		break;
 	}
 	case MessageType::ChatMessage:
 		break;
-	case MessageType::ServerStopped:
+	case MessageType::AnnounceClientExit:
 		break;
 	}
 }

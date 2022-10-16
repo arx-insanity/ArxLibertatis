@@ -1156,7 +1156,7 @@ extern Server * g_server;
 void DANAE_StartNewQuest() {
 	if (g_server != nullptr && g_server->isRunning()) {
 		LevelChange msg(1);
-		g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
+		g_server->broadcast(MessageType::LevelChange, &msg);
 	}
 	benchmark::begin(benchmark::LoadLevel);
 	player.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;

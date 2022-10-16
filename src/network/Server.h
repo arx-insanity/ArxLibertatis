@@ -26,10 +26,10 @@ public:
 	void stop();
 	bool isRunning();
 	void handleClientMessage(ClientData* sender, MessageType messageType, std::vector<unsigned char>& buffer);
-	void broadcast(uint32_t sender, uint16_t messageType);
-	void broadcast(uint32_t sender, MessageType messageType);
-	void broadcast(uint32_t sender, uint16_t messageType, std::vector<unsigned char>& buffer);
-	void broadcast(uint32_t sender, MessageType messageType, Message* message);
+	void broadcast(uint16_t messageType);
+	void broadcast(MessageType messageType);
+	void broadcast(uint16_t messageType, std::vector<unsigned char>& buffer);
+	void broadcast(MessageType messageType, Message* message);
 };
 
 #endif // ARX_NETWORK_SERVER_H

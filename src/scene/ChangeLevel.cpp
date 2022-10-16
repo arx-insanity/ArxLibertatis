@@ -1379,7 +1379,7 @@ extern Server * g_server;
 static long ARX_CHANGELEVEL_Pop_Level(long num, bool firstTime) {
 	if (g_server != nullptr && g_server->isRunning()) {
 		LevelChange msg(num);
-		g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
+		g_server->broadcast(MessageType::LevelChange, &msg);
 	}
 
 	LOAD_N_ERASE = false;

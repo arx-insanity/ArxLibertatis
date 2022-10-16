@@ -697,7 +697,7 @@ static bool HandleGameFlowTransitions() {
 	if(GameFlow::getTransition() == GameFlow::LoadingScreen) {
 		if (g_server != nullptr && g_server->isRunning()) {
 			LevelChange msg(LEVEL_TO_LOAD);
-			g_server->broadcast(NULL, MessageType::ChangeLevel, &msg);
+			g_server->broadcast(MessageType::LevelChange, &msg);
 		}
 
 		ARX_INTERFACE_KillFISHTANK();

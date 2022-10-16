@@ -62,7 +62,6 @@ void ClientData::readerLoop() {
 			buffer.resize(writePos + received);
 			memcpy(&buffer[writePos], constBuffer, received);
 		}
-		id = frameHeader.sender;
 		server->handleClientMessage(this, static_cast<MessageType>(frameHeader.messageType), buffer);
 		buffer.clear();
 	}

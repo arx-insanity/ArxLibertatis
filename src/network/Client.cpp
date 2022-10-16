@@ -76,7 +76,7 @@ void Client::disconnect() {
 
 void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& buffer) {
 	switch (messageType) {
-	case MessageType::ChangeLevel:
+	case MessageType::LevelChange:
 	{
 		LevelChange msg;
 		msg.read(buffer.data(), buffer.size());
@@ -88,7 +88,7 @@ void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& 
 	}
 	case MessageType::ChatMessage:
 		break;
-	case MessageType::ServerStopped:
+	case MessageType::AnnounceServerExit:
 		break;
 	}
 }
@@ -107,7 +107,6 @@ void Client::sendMessage(uint16_t messageType) {
 	FrameHeader fh;
 	fh.length = 0;
 	fh.messageType = messageType;
-	fh.sender = id;
 	sendMessage(fh, NULL);
 }
 void Client::sendMessage(MessageType messageType) {
@@ -118,7 +117,6 @@ void Client::sendMessage(uint16_t messageType, std::vector<unsigned char>& buffe
 	FrameHeader fh;
 	fh.length = buffer.size();
 	fh.messageType = messageType;
-	fh.sender = id;
 	sendMessage(fh, buffer.data());
 }
 void Client::sendMessage(MessageType messageType, Message* message) {
