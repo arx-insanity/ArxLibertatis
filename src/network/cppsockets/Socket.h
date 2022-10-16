@@ -20,10 +20,10 @@ public:
 	void close(void) {
 		if (_sock != INVALID_SOCKET) {
 			#if ARX_PLATFORM == ARX_PLATFORM_WIN32
-				disconnect(_sock, SD_BOTH);
+				shutdown(_sock, SD_BOTH);
 				closesocket(_sock);
 			#else
-				disconnect(_sock, SHUT_RDWR);
+				shutdown(_sock, SHUT_RDWR);
 				::close(_sock);
 			#endif
 
