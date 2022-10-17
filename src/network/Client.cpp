@@ -6,12 +6,9 @@
 #include "io/log/Logger.h"
 #include "network/common.h"
 #include "network/Client.h"
-#include "network/messages/LevelChange.h"
-#include "network/messages/Handshake.h"
-#include "network/messages/HandshakeAnswer.h"
-#include "network/messages/ChangePlayerPosition.h"
+#include "network/messages/MessageFactory.h"
 
-Client::Client(std::string ip, unsigned short port) : ip(ip), port(port), readerRunning(false) {
+Client::Client(std::string server_ip, unsigned short server_port) : server_ip(server_ip), server_port(server_port), readerRunning(false) {
 	id = ""; //gets set by handshake answer
 }
 
@@ -39,7 +36,10 @@ void Client::readerLoop() {
 			buffer.resize(writePos + received);
 			memcpy(&buffer[writePos], constBuffer, received);
 		}
-		handleMessage(static_cast<MessageType>(frameHeader.messageType), buffer);
+		IncomingMessage* message = static_cast<IncomingMessage*>(MessageFactory::createMessage(static_cast<MessageType>(frameHeader.messageType)));
+		message->read(buffer.data(), buffer.size());
+		handleMessage(message);
+		delete message;
 		buffer.clear();
 	}
 exitReaderLoop:
@@ -56,11 +56,11 @@ void Client::connect() {
 	}
 	LogInfo << "Connecting to server...";
 	CppSockets::cppSocketsInit();
-	client = std::make_shared<CppSockets::TcpClient>(ip.c_str(), port);
+	client = std::make_shared<CppSockets::TcpClient>(server_ip.c_str(), server_port);
 	this->readerThread = std::make_shared<std::thread>(&Client::readerLoop, this);
 
 	Handshake msg("Am Shaegar");
-	this->sendMessage(MessageType::Handshake, &msg);
+	this->sendMessage(&msg);
 
 	LogInfo << "Connected";
 }
@@ -76,25 +76,25 @@ void Client::disconnect() {
 	LogInfo << "Disconnected";
 }
 
-void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& buffer) {
+void Client::handleMessage(IncomingMessage* message) {
+	MessageType messageType = message->getMessageType();
 	switch (messageType) {
-	case MessageType::LevelChange:
+	case MessageType::HandshakeAnswer:
 	{
-		LevelChange msg;
-		msg.read(buffer.data(), buffer.size());
-		TELEPORT_TO_LEVEL = msg.level;
+		auto handshakeAnswer = static_cast<HandshakeAnswer*>(message);
+		id = handshakeAnswer->getId();
+		break;
+	}
+	case MessageType::IncomingLevelChange:
+	{
+		auto incominglevelChange = static_cast<IncomingLevelChange*>(message);
+		TELEPORT_TO_LEVEL = incominglevelChange->level;
 		TELEPORT_TO_POSITION = "";
 		TELEPORT_TO_ANGLE = static_cast<long>(player.angle.getYaw());
 		CHANGE_LEVEL_ICON = ChangeLevelNow;
 		break;
 	}
-	case MessageType::HandshakeAnswer:
-	{
-		HandshakeAnswer msg;
-		msg.read(buffer.data(), buffer.size());
-		id = msg.getId();
-		break;
-	}
+
 	case MessageType::IncomingChatMessage:
 		//TODO: display chat message
 		break;
@@ -107,12 +107,12 @@ void Client::handleMessage(MessageType messageType, std::vector<unsigned char>& 
 	case MessageType::AnnounceServerExit:
 		//TODO: disconnect
 		break;
-	case MessageType::ChangePlayerPosition:
+	case MessageType::IncomingChangePlayerPosition:
 	{
-		ChangePlayerPosition msg;
-		msg.read(buffer.data(), buffer.size());
-		std::string clientId = "?"; // TODO: get the client ID
-		LogInfo << "client " << clientId << " moved to: [" << msg.position.x << ", " << msg.position.y << ", " << msg.position.z << "]";
+		auto incomingChangePlayerPosition = static_cast<IncomingChangePlayerPosition*>(message);
+		std::string clientId = incomingChangePlayerPosition->sender_id;
+		auto pos = incomingChangePlayerPosition->position;
+		LogInfo << "client " << clientId << " moved to: [" << pos.x << ", " << pos.y << ", " << pos.z << "]";
 		break;
 	}
 	}
@@ -122,31 +122,17 @@ bool Client::isConnected() {
 	return this->readerRunning;
 }
 
-void Client::sendMessage(FrameHeader header, unsigned char* body) {
-	client->sendData(&header, sizeof(header));
-	if (header.length > 0 && body != NULL) {
-		client->sendData(body, header.length);
-	}
-}
-void Client::sendMessage(uint16_t messageType) {
-	FrameHeader fh;
-	fh.length = 0;
-	fh.messageType = messageType;
-	sendMessage(fh, NULL);
-}
-void Client::sendMessage(MessageType messageType) {
-	sendMessage(static_cast<uint16_t>(messageType));
-}
-
-void Client::sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer) {
-	FrameHeader fh;
-	fh.length = buffer.size();
-	fh.messageType = messageType;
-	sendMessage(fh, buffer.data());
-}
-void Client::sendMessage(MessageType messageType, Message* message) {
+void Client::sendMessage(OutgoingMessage* message) {
 	std::vector<unsigned char> buffer;
 	message->send(buffer);
-	sendMessage(static_cast<uint16_t>(messageType), buffer);
+	FrameHeader fh{};
+	fh.length = buffer.size();
+	fh.messageType = static_cast<uint16_t>(message->getMessageType());
+	client->sendData(&fh, sizeof(fh));
+	if (fh.length > 0) {
+		auto body = buffer.data();
+		client->sendData(body, fh.length);
+	}
 }
+
 

@@ -6,18 +6,23 @@
 
 enum class MessageType :uint16_t {
 	//Excplicitly listing ids so they cant be accidentally changed
+
 	Handshake = 1,
 	AnnounceClientEnter = 2,
 	AnnounceClientExit = 3,
 	AnnounceServerExit = 4,
-	LevelChange = 5,
+	OutgoingLevelChange = 5,
 	ByeBye = 6,
 	OutgoingChatMessage = 7,
 	IncomingChatMessage = 8,
 	HandshakeAnswer = 9,
-	ChangePlayerPosition = 10,
-	ChangePlayerOrientation = 11,
-	TriggerPlayerJump = 12,
+	OutgoingChangePlayerPosition = 10,
+	OutgoingChangePlayerOrientation = 11,
+	OutgoingTriggerPlayerJump = 12,
+	IncomingChangePlayerPosition = 13,
+	IncomingChangePlayerOrientation = 14,
+	IncomingTriggerPlayerJump = 15,
+	IncomingLevelChange = 16,
 };
 
 

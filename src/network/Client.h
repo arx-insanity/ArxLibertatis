@@ -5,11 +5,13 @@
 #include <string>
 #include "network/cppsockets/TcpClient.h"
 #include "network/messages/Message.h"
+#include "network/messages/outgoing/OutgoingMessage.h"
+#include "network/messages/incoming/IncomingMessage.h"
 
 class Client {
 	std::string id;
-	std::string ip;
-	unsigned short port;
+	std::string server_ip;
+	unsigned short server_port;
 	std::shared_ptr<CppSockets::TcpClient> client;
 	std::shared_ptr<std::thread> readerThread;
 	//std::string nickname;
@@ -17,22 +19,18 @@ class Client {
 	bool readerRunning;
 
 	void readerLoop();
-	void handleMessage(MessageType messageType, std::vector<unsigned char> &buffer);
+	void handleMessage(IncomingMessage* message);
 
 	//no copy or assignment
 	Client(const Client& other) = delete;
 	Client& operator=(const Client&) = delete;
   public:
-    Client(std::string ip, unsigned short port);
+    Client(std::string server_ip, unsigned short server_port);
     void connect();
     void disconnect();
     bool isConnected();
 
-	void sendMessage(FrameHeader header, unsigned char* body);
-	void sendMessage(uint16_t messageType);
-	void sendMessage(MessageType messageType);
-	void sendMessage(uint16_t messageType, std::vector<unsigned char>& buffer);
-	void sendMessage(MessageType messageType, Message* message);
+	void sendMessage(OutgoingMessage* message);
 };
 
 #endif // ARX_NETWORK_CLIENT_H

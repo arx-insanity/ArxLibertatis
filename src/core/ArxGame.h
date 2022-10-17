@@ -50,7 +50,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "graphics/Renderer.h"
 
-#include "network/Server.h"
 #include "network/Client.h"
 
 #include "window/Window.h"
@@ -138,7 +137,6 @@ extern TextureContainer * enviro;
 
 extern SavegameHandle LOADQUEST_SLOT;
 
-extern Server * g_server;
 extern Client * g_client;
 
 #endif // ARX_CORE_ARXGAME_H

@@ -134,6 +134,9 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "math/Rectangle.h"
 #include "math/Vector.h"
 
+#include "network/common.h"
+#include "network/messages/outgoing/OutgoingLevelChange.h"
+
 #include "physics/Attractors.h"
 
 #include "io/fs/FilePath.h"
@@ -170,9 +173,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "window/RenderWindow.h"
 
-#include "network/common.h"
-#include "network/messages/LevelChange.h"
-
 #if ARX_HAVE_SDL2
 #include "window/SDL2Window.h"
 #endif
@@ -180,7 +180,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "window/SDL1Window.h"
 #endif
 
-Server * g_server = nullptr;
 Client * g_client = nullptr;
 
 InfoPanels g_debugInfo = InfoPanelNone;
@@ -586,23 +585,6 @@ static void loadSave(const std::string & saveFile) {
 }
 ARX_PROGRAM_OPTION_ARG("loadsave", "", "Load a specific savegame file", &loadSave, "SAVEFILE")
 
-static void startAsServer(const std::string & rawPort) {
-	long port = strtol(rawPort.c_str(), nullptr, 10);
-
-	if (port < 1 || port > 0xffff) {
-		LogError << "port is out of range, expected an integer between 1 and 65536, got '" << rawPort << "'";
-		return;
-	}
-
-	g_server = new Server(port);
-
-	// TODO: move this somewhere else, create the server later
-	if (g_server != nullptr && !g_server->isRunning()) {
-		g_server->start();
-	}
-}
-ARX_PROGRAM_OPTION_ARG("server", "", "Start a multiplayer server using the specified PORT", &startAsServer, "PORT")
-
 static void startAsClient(const std::string & rawTarget) {
 	size_t colon = rawTarget.find(':');
 	if (colon == std::string::npos) {
@@ -693,14 +675,9 @@ static bool HandleGameFlowTransitions() {
 	}
 
 	if(GameFlow::getTransition() == GameFlow::LoadingScreen) {
-		{
-			LevelChange msg(LEVEL_TO_LOAD);
-			if (g_server != nullptr && g_server->isRunning()) {
-				g_server->broadcast(MessageType::LevelChange, &msg);
-			}
-			if (g_client != nullptr && g_client->isConnected()) {
-				g_client->sendMessage(MessageType::LevelChange, &msg);
-			}
+		if (g_client != nullptr && g_client->isConnected()) {
+			OutgoingLevelChange msg(LEVEL_TO_LOAD);
+			g_client->sendMessage(&msg);
 		}
 
 		ARX_INTERFACE_KillFISHTANK();
@@ -984,9 +961,6 @@ void ArxGame::shutdown() {
 	if(m_gameInitialized)
 		shutdownGame();
 
-	if (g_server != nullptr && g_server->isRunning()) {
-		g_server->stop();
-	}
 	if (g_client != nullptr && g_client->isConnected()) {
 		g_client->disconnect();
 	}
