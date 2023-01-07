@@ -397,7 +397,7 @@ static bool IsObjectInField(const PHYSICS_BOX_DATA & pbox) {
 	return false;
 }
 
-static Material polyTypeToCollisionMaterial(const EERIEPOLY & ep) {
+Material polyTypeToCollisionMaterial(const EERIEPOLY & ep) {
 	if(ep.type & POLY_METAL) {
 		return MATERIAL_METAL;
 	}
@@ -416,7 +416,7 @@ static Material polyTypeToCollisionMaterial(const EERIEPOLY & ep) {
 	if(ep.type & POLY_EARTH) {
 		return MATERIAL_EARTH;
 	}
-	return MATERIAL_STONE;
+	return MATERIAL_NONE;
 }
 
 static bool ARX_INTERACTIVE_CheckFULLCollision(const PHYSICS_BOX_DATA & pbox, Entity & source) {
@@ -567,7 +567,10 @@ static void ARX_EERIE_PHYSICS_BOX_Compute(PHYSICS_BOX_DATA & pbox, float framedi
 	
 	Material collisionMat = MATERIAL_STONE;
 	if(collisionPoly) {
-		collisionMat = polyTypeToCollisionMaterial(*collisionPoly);
+		Material polygonMaterial = polyTypeToCollisionMaterial(*collisionPoly);
+		if (polygonMaterial != MATERIAL_NONE) {
+			collisionMat = polygonMaterial;
+		}
 	}
 	Vec3f velocity = pbox.vert[0].velocity;
 	float power = (glm::abs(velocity.x) + glm::abs(velocity.y) + glm::abs(velocity.z)) * .01f;

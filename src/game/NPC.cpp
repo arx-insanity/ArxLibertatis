@@ -2608,8 +2608,19 @@ void ARX_NPC_NeedStepSound(Entity * io, const Vec3f & pos, const float volume, c
 		floor_material = "water";
 	} else {
 		EERIEPOLY * ep = CheckInPoly(pos + Vec3f(0.f, -100.f, 0.f));
-		if(ep && ep->tex && !ep->tex->m_texName.empty()) {
-			floor_material = GetMaterialString(ep->tex->m_texName);
+
+		if (ep) {
+			if(ep->tex && !ep->tex->m_texName.empty()) {
+				std::string_view texture_name_material = GetMaterialString(ep->tex->m_texName);
+				if (texture_name_material != "unknown") {
+					floor_material = texture_name_material;
+				}
+			}
+			
+			Material polygon_material = polyTypeToCollisionMaterial(*ep);
+			if (polygon_material != MATERIAL_NONE) {
+				floor_material = ARX_MATERIAL_GetNameById(polygon_material);
+			}
 		}
 	}
 	

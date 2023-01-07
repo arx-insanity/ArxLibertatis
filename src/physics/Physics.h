@@ -100,4 +100,6 @@ void EERIE_PHYSICS_BOX_Create(EERIE_3DOBJ * obj);
 void EERIE_PHYSICS_BOX_Launch(EERIE_3DOBJ * obj, const Vec3f & pos, const Anglef & angle, const Vec3f & vect);
 void ARX_PHYSICS_BOX_ApplyModel(PHYSICS_BOX_DATA & pbox, float framediff, float rubber, Entity & source);
 
+Material polyTypeToCollisionMaterial(const EERIEPOLY & ep);
+
 #endif // ARX_PHYSICS_PHYSICS_H
