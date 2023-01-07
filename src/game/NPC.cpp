@@ -2602,7 +2602,7 @@ void CheckNPCEx(Entity & io) {
 void ARX_NPC_NeedStepSound(Entity * io, const Vec3f & pos, const float volume, const float power) {
 	
 	std::string_view step_material = "foot_bare";
-	std::string_view floor_material = "earth";
+	std::string_view floor_material = "stone";
 	
 	if(EEIsUnderWater(pos)) {
 		floor_material = "water";
@@ -2616,7 +2616,7 @@ void ARX_NPC_NeedStepSound(Entity * io, const Vec3f & pos, const float volume, c
 					floor_material = texture_name_material;
 				}
 			}
-			
+
 			Material polygon_material = polyTypeToCollisionMaterial(*ep);
 			if (polygon_material != MATERIAL_NONE) {
 				floor_material = ARX_MATERIAL_GetNameById(polygon_material);
