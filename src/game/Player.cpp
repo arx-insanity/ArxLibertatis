@@ -1068,6 +1068,12 @@ void ARX_PLAYER_Restore_Skin() {
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero9_head";
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero9_head";
 			break;
+		case 9:
+			tx  = "graph/obj3d/textures/npc_human_base_hero10_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero10_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero10_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero10_head";
+			break;
 		case MX_PLAYER_SKIN:
 			tx  = "graph/obj3d/textures/npc_human_cm_hero_head";
 			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
