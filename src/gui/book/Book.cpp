@@ -1087,22 +1087,7 @@ void StatsPage::RenderBookPlayerCharacter() {
 	Anglef ePlayerAngle;
 	Vec3f pos;
 	if(ARXmenu.mode() == Mode_CharacterCreation) {
-		
-		switch(player.skin) {
-			case 0:
-				ePlayerAngle.setYaw(-25.f);
-				break;
-			case 1:
-				ePlayerAngle.setYaw(-10.f);
-				break;
-			case 2:
-				ePlayerAngle.setYaw(20.f);
-				break;
-			case 3:
-				ePlayerAngle.setYaw(35.f);
-				break;
-		}
-		
+		ePlayerAngle.setYaw(-25.f + player.skin * static_cast<float>(ceil(70 / MX_PLAYER_SKIN)));
 		pos = Vec3f(8, 162, 75);
 		eLight1.pos.z = -90.f;
 		

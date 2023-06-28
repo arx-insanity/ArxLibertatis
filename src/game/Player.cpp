@@ -744,7 +744,7 @@ void ARX_PLAYER_MakeSpHero()
 	player.xp = 0;
 	player.poison = 0.f;
 	player.hunger = 100.f;
-	player.skin = 4;
+	player.skin = MX_PLAYER_SKIN;
 
 	ARX_PLAYER_ComputePlayerStats();
 	player.lifePool.current = player.m_lifeMaxWithoutMods;
@@ -1039,18 +1039,42 @@ void ARX_PLAYER_Restore_Skin() {
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero4_head";
 			break;
 		case 4:
+			tx  = "graph/obj3d/textures/npc_human_base_hero5_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero5_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero5_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero5_head";
+			break;
+		case 5:
+			tx  = "graph/obj3d/textures/npc_human_base_hero6_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero6_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero6_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero6_head";
+			break;
+		case 6:
+			tx  = "graph/obj3d/textures/npc_human_base_hero7_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero7_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero7_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero7_head";
+			break;
+		case 7:
+			tx  = "graph/obj3d/textures/npc_human_base_hero8_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero8_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero8_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero8_head";
+			break;
+		case 8:
+			tx  = "graph/obj3d/textures/npc_human_base_hero9_head";
+			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero9_head";
+			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero9_head";
+			tx4 = "graph/obj3d/textures/npc_human_leather_hero9_head";
+			break;
+		case MX_PLAYER_SKIN:
 			tx  = "graph/obj3d/textures/npc_human_cm_hero_head";
 			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
 			break;
-		case 5:
-			tx  = "graph/obj3d/textures/npc_human__base_hero_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
-			break;
-		case 6: // Just in case
+		case EXTRA_PLAYER_SKIN:
 			tx  = "graph/obj3d/textures/npc_human__base_hero_head";
 			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";

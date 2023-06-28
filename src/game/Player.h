@@ -405,6 +405,9 @@ struct ARXCHARACTER {
 	
 };
 
+constexpr short MX_PLAYER_SKIN = 9;
+constexpr short EXTRA_PLAYER_SKIN = MX_PLAYER_SKIN + 1;
+
 extern float CURRENT_PLAYER_COLOR;
 
 extern ARXCHARACTER player;
