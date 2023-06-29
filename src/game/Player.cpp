@@ -744,7 +744,7 @@ void ARX_PLAYER_MakeSpHero()
 	player.xp = 0;
 	player.poison = 0.f;
 	player.hunger = 100.f;
-	player.skin = MX_PLAYER_SKIN;
+	player.skin = MAX_CHEAT_PLAYER_SKIN;
 
 	ARX_PLAYER_ComputePlayerStats();
 	player.lifePool.current = player.m_lifeMaxWithoutMods;
@@ -1020,7 +1020,7 @@ void ARX_PLAYER_Restore_Skin() {
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
 			break;
-		case MX_PLAYER_SKIN:
+		case MAX_CHEAT_PLAYER_SKIN:
 			tx  = "graph/obj3d/textures/npc_human_cm_hero_head";
 			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
