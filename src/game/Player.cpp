@@ -1033,11 +1033,11 @@ void ARX_PLAYER_Restore_Skin() {
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
 			break;
 		default : {
-				std::string skin_index = std::to_string(static_cast<int>(player.skin + 1));
-				tx  = "graph/obj3d/textures/npc_human_base_hero" + skin_index + "_head";
-				tx2 = "graph/obj3d/textures/npc_human_chainmail_hero" + skin_index + "_head";
-				tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero" + skin_index + "_head";
-				tx4 = "graph/obj3d/textures/npc_human_leather_hero" + skin_index + "_head";
+				std::string skinIndex = std::to_string(static_cast<int>(player.skin + 1));
+				tx  = "graph/obj3d/textures/npc_human_base_hero" + skinIndex + "_head";
+				tx2 = "graph/obj3d/textures/npc_human_chainmail_hero" + skinIndex + "_head";
+				tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero" + skinIndex + "_head";
+				tx4 = "graph/obj3d/textures/npc_human_leather_hero" + skinIndex + "_head";
 			}
 	}
 
