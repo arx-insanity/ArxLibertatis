@@ -1012,67 +1012,13 @@ void ARX_PLAYER_Restore_Skin() {
 	res::path tx2;
 	res::path tx3;
 	res::path tx4;
-	
+
 	switch(player.skin) {
 		case 0:
 			tx  = "graph/obj3d/textures/npc_human_base_hero_head";
 			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero_head";
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
-			break;
-		case 1:
-			tx  = "graph/obj3d/textures/npc_human_base_hero2_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero2_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero2_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero2_head";
-			break;
-		case 2:
-			tx  = "graph/obj3d/textures/npc_human_base_hero3_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero3_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero3_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero3_head";
-			break;
-		case 3:
-			tx  = "graph/obj3d/textures/npc_human_base_hero4_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero4_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero4_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero4_head";
-			break;
-		case 4:
-			tx  = "graph/obj3d/textures/npc_human_base_hero5_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero5_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero5_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero5_head";
-			break;
-		case 5:
-			tx  = "graph/obj3d/textures/npc_human_base_hero6_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero6_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero6_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero6_head";
-			break;
-		case 6:
-			tx  = "graph/obj3d/textures/npc_human_base_hero7_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero7_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero7_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero7_head";
-			break;
-		case 7:
-			tx  = "graph/obj3d/textures/npc_human_base_hero8_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero8_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero8_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero8_head";
-			break;
-		case 8:
-			tx  = "graph/obj3d/textures/npc_human_base_hero9_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero9_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero9_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero9_head";
-			break;
-		case 9:
-			tx  = "graph/obj3d/textures/npc_human_base_hero10_head";
-			tx2 = "graph/obj3d/textures/npc_human_chainmail_hero10_head";
-			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero10_head";
-			tx4 = "graph/obj3d/textures/npc_human_leather_hero10_head";
 			break;
 		case MX_PLAYER_SKIN:
 			tx  = "graph/obj3d/textures/npc_human_cm_hero_head";
@@ -1086,6 +1032,13 @@ void ARX_PLAYER_Restore_Skin() {
 			tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero_head";
 			tx4 = "graph/obj3d/textures/npc_human_leather_hero_head";
 			break;
+		default : {
+				std::string skin_index = std::to_string(static_cast<int>(player.skin + 1));
+				tx  = "graph/obj3d/textures/npc_human_base_hero" + skin_index + "_head";
+				tx2 = "graph/obj3d/textures/npc_human_chainmail_hero" + skin_index + "_head";
+				tx3 = "graph/obj3d/textures/npc_human_chainmail_mithril_hero" + skin_index + "_head";
+				tx4 = "graph/obj3d/textures/npc_human_leather_hero" + skin_index + "_head";
+			}
 	}
 
 	TextureContainer * tmpTC;
