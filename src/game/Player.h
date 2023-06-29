@@ -405,8 +405,8 @@ struct ARXCHARACTER {
 	
 };
 
-/**
- * player.skin goes from 0 to NUMBER_OF_PLAYER_SKINS - 1
+/*!
+ * \brief player.skin goes from 0 to NUMBER_OF_PLAYER_SKINS - 1
  */
 constexpr short NUMBER_OF_PLAYER_SKINS = 10;
 constexpr short MAX_CHEAT_PLAYER_SKIN = NUMBER_OF_PLAYER_SKINS;
