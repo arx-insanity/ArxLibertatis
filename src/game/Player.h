@@ -405,7 +405,11 @@ struct ARXCHARACTER {
 	
 };
 
-constexpr short MX_PLAYER_SKIN = 10;
+/**
+ * player.skin goes from 0 to NUMBER_OF_PLAYER_SKINS - 1
+ */
+constexpr short NUMBER_OF_PLAYER_SKINS = 10;
+constexpr short MX_PLAYER_SKIN = NUMBER_OF_PLAYER_SKINS;
 constexpr short EXTRA_PLAYER_SKIN = MX_PLAYER_SKIN + 1;
 
 extern float CURRENT_PLAYER_COLOR;
