@@ -323,11 +323,12 @@ public:
 	
 	Result execute(Context & context) override {
 		
-		long buyPrice = std::max(long(context.getFloat()), 0l);
+		long price = std::max(long(context.getFloat()), 0l);
 		
-		DebugScript(' ' << buyPrice);
+		DebugScript(' ' << price);
 		
-		context.getEntity()->_itemdata->buyPrice = buyPrice;
+		context.getEntity()->_itemdata->buyPrice = price;
+		context.getEntity()->_itemdata->sellPrice = price;
 		
 		return Success;
 	}
