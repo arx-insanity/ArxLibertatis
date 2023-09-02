@@ -116,7 +116,7 @@ struct IO_EQUIPITEM {
 struct IO_ITEMDATA {
 	
 	IO_EQUIPITEM * equipitem; // Equipitem Datas
-	long price;
+	long buyPrice;
 	short maxcount; // max number cumulable
 	short count; // current number
 	char food_value;
@@ -127,7 +127,7 @@ struct IO_ITEMDATA {
 	
 	IO_ITEMDATA()
 		: equipitem(0)
-		, price(0)
+		, buyPrice(0)
 		, maxcount(0)
 		, count(0)
 		, food_value(0)

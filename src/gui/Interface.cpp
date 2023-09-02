@@ -1621,7 +1621,7 @@ void ArxGame::manageEntityDescription() {
 	std::stringstream ss;
 	
 	if(temp->ioflags & IO_GOLD) {
-		ss << temp->_itemdata->price << " ";
+		ss << temp->_itemdata->buyPrice << " ";
 	}
 	
 	ss << getLocalised(temp->locname);

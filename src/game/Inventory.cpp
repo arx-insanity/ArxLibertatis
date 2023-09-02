@@ -812,9 +812,9 @@ bool combineItemStacks(Entity * target, Entity * source) {
 		return false;
 	}
 	
-	// Gold stacks use price instead of count
+	// Gold stacks use buyPrice instead of count
 	if((target->ioflags & IO_GOLD) && (source->ioflags & IO_GOLD)) {
-		target->_itemdata->price += source->_itemdata->price;
+		target->_itemdata->buyPrice += source->_itemdata->buyPrice;
 		source->destroy();
 		return true;
 	}

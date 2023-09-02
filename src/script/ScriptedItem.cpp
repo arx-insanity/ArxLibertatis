@@ -327,7 +327,7 @@ public:
 		
 		DebugScript(' ' << price);
 		
-		context.getEntity()->_itemdata->price = price;
+		context.getEntity()->_itemdata->buyPrice = price;
 		
 		return Success;
 	}

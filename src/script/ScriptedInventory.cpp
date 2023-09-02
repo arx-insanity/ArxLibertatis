@@ -238,7 +238,7 @@ class InventoryCommand : public Command {
 				DebugScript(' ' << file << ' ' << count);
 				
 				if(ioo->ioflags & IO_GOLD) {
-					ioo->_itemdata->price = static_cast<long>(count);
+					ioo->_itemdata->buyPrice = static_cast<long>(count);
 				} else {
 					ioo->_itemdata->maxcount = 9999;
 					ioo->_itemdata->count = std::max(util::to<short>(count), short(1));
@@ -339,7 +339,7 @@ class InventoryCommand : public Command {
 			
 			if(multi) {
 				if(item->ioflags & IO_GOLD) {
-					item->_itemdata->price = count;
+					item->_itemdata->buyPrice = count;
 				} else {
 					item->_itemdata->maxcount = 9999;
 					item->_itemdata->count = std::max(util::to<short>(count), short(1));

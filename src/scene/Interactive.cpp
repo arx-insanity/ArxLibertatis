@@ -154,7 +154,7 @@ s32 ARX_INTERACTIVE_GetBuyPrice(Entity * io, Entity * shop) {
 	float shop_multiply = shop ? shop->shop_multiply : 1.f;
 	float durability_ratio = io->durability / io->max_durability;
 	
-	return s32(float(io->_itemdata->price) * shop_multiply * durability_ratio);
+	return s32(float(io->_itemdata->buyPrice) * shop_multiply * durability_ratio);
 }
 
 s32 ARX_INTERACTIVE_GetSellPrice(Entity * io, Entity * shop) {
@@ -166,7 +166,7 @@ s32 ARX_INTERACTIVE_GetSellPrice(Entity * io, Entity * shop) {
 	float shop_multiply = shop ? shop->shop_multiply : 1.f;
 	float durability_ratio = io->durability / io->max_durability;
 	
-	return s32(float(io->_itemdata->price) * shop_multiply * durability_ratio);
+	return s32(float(io->_itemdata->buyPrice) * shop_multiply * durability_ratio);
 }
 
 s32 ARX_INTERACTIVE_GetSellValue(Entity * item, Entity * shop, long count) {
@@ -943,7 +943,7 @@ Entity * CloneIOItem(Entity * src) {
 	delete dest->obj;
 	dest->obj = Eerie_Copy(src->obj);
 	CloneLocalVars(dest, src);
-	dest->_itemdata->price = src->_itemdata->price;
+	dest->_itemdata->buyPrice = src->_itemdata->buyPrice;
 	dest->_itemdata->maxcount = src->_itemdata->maxcount;
 	dest->_itemdata->count = src->_itemdata->count;
 	dest->_itemdata->food_value = src->_itemdata->food_value;
@@ -1564,9 +1564,9 @@ Entity * AddItem(const res::path & classPath_, EntityInstance instance, AddInter
 	io->_itemdata->LightValue = -1;
 
 	if(io->ioflags & IO_GOLD)
-		io->_itemdata->price = 1;
+		io->_itemdata->buyPrice = 1;
 	else
-		io->_itemdata->price = 10;
+		io->_itemdata->buyPrice = 10;
 
 	io->_itemdata->playerstacksize = 1;
 
@@ -2192,13 +2192,13 @@ void UpdateGoldObject(Entity * io) {
 	if(io->ioflags & IO_GOLD) {
 		
 		long num = 0;
-		if(io->_itemdata->price <= 3) {
-			num = io->_itemdata->price - 1;
-		} else if(io->_itemdata->price <= 8) {
+		if(io->_itemdata->buyPrice <= 3) {
+			num = io->_itemdata->buyPrice - 1;
+		} else if(io->_itemdata->buyPrice <= 8) {
 			num = 3;
-		} else if(io->_itemdata->price <= 20) {
+		} else if(io->_itemdata->buyPrice <= 20) {
 			num = 4;
-		} else if(io->_itemdata->price <= 50) {
+		} else if(io->_itemdata->buyPrice <= 50) {
 			num = 5;
 		} else {
 			num = 6;

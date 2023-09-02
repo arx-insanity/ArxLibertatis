@@ -1188,7 +1188,7 @@ static bool ARX_CHANGELEVEL_Push_IO(const Entity * io, AreaId area) {
 			
 			memset(ai, 0, sizeof(ARX_CHANGELEVEL_ITEM_IO_SAVE));
 			
-			ai->price = io->_itemdata->price;
+			ai->buyPrice = io->_itemdata->buyPrice;
 			ai->count = io->_itemdata->count;
 			ai->maxcount = io->_itemdata->maxcount;
 			ai->food_value = io->_itemdata->food_value;
@@ -2093,7 +2093,7 @@ static Entity * ARX_CHANGELEVEL_Pop_IO(std::string_view idString, EntityInstance
 				ai = reinterpret_cast<const ARX_CHANGELEVEL_ITEM_IO_SAVE *>(dat + pos);
 				pos += sizeof(ARX_CHANGELEVEL_ITEM_IO_SAVE);
 				
-				io->_itemdata->price = ai->price;
+				io->_itemdata->buyPrice = ai->buyPrice;
 				io->_itemdata->count = ai->count;
 				io->_itemdata->maxcount = ai->maxcount;
 				io->_itemdata->food_value = ai->food_value;
