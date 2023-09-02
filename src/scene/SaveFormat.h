@@ -892,6 +892,7 @@ struct SavedEquipItem {
 
 struct ARX_CHANGELEVEL_ITEM_IO_SAVE {
 	s32 buyPrice;
+	s32 sellPrice;
 	s16 maxcount;
 	s16 count;
 	char food_value;
