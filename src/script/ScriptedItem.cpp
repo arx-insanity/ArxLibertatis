@@ -365,7 +365,7 @@ public:
 		
 		DebugScript(' ' << sellPrice);
 		
-		context.getEntity()->_itemdata->buyPrice = sellPrice;
+		context.getEntity()->_itemdata->sellPrice = sellPrice;
 		
 		return Success;
 	}

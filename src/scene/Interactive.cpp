@@ -166,7 +166,7 @@ s32 ARX_INTERACTIVE_GetSellPrice(Entity * io, Entity * shop) {
 	float shop_multiply = shop ? shop->shop_multiply : 1.f;
 	float durability_ratio = io->durability / io->max_durability;
 	
-	return s32(float(io->_itemdata->buyPrice) * shop_multiply * durability_ratio);
+	return s32(float(io->_itemdata->sellPrice) * shop_multiply * durability_ratio);
 }
 
 s32 ARX_INTERACTIVE_GetSellValue(Entity * item, Entity * shop, long count) {
@@ -944,6 +944,7 @@ Entity * CloneIOItem(Entity * src) {
 	dest->obj = Eerie_Copy(src->obj);
 	CloneLocalVars(dest, src);
 	dest->_itemdata->buyPrice = src->_itemdata->buyPrice;
+	dest->_itemdata->sellPrice = src->_itemdata->sellPrice;
 	dest->_itemdata->maxcount = src->_itemdata->maxcount;
 	dest->_itemdata->count = src->_itemdata->count;
 	dest->_itemdata->food_value = src->_itemdata->food_value;
