@@ -377,7 +377,7 @@ void SecondaryInventoryHud::dragEntity(Entity * io) {
 	Entity * container = m_container;
 	if(container->ioflags & IO_SHOP) {
 		
-		long price = ARX_INTERACTIVE_GetPrice(io, container);
+		long price = ARX_INTERACTIVE_GetBuyPrice(io, container);
 		price = util::to<long>(float(price) - float(price) * player.m_skillFull.intuition * 0.005f);
 		if(player.gold < price) {
 			return;
@@ -556,7 +556,7 @@ void SecondaryInventoryHud::drawItemPrice(float scale) {
 		
 		if(g_secondaryInventoryHud.containsPos(DANAEMouse)) {
 			
-			long amount = ARX_INTERACTIVE_GetPrice(FlyingOverIO, m_container);
+			long amount = ARX_INTERACTIVE_GetBuyPrice(FlyingOverIO, m_container);
 			// achat
 			float famount = amount - amount * player.m_skillFull.intuition * 0.005f;
 			// check should always be OK because amount is supposed positive

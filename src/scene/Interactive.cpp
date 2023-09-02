@@ -145,7 +145,19 @@ bool ValidIOAddress(const Entity * io) {
 	return false;
 }
 
-s32 ARX_INTERACTIVE_GetPrice(Entity * io, Entity * shop) {
+s32 ARX_INTERACTIVE_GetBuyPrice(Entity * io, Entity * shop) {
+	
+	if(!io || !(io->ioflags & IO_ITEM)) {
+		return 0;
+	}
+	
+	float shop_multiply = shop ? shop->shop_multiply : 1.f;
+	float durability_ratio = io->durability / io->max_durability;
+	
+	return s32(float(io->_itemdata->price) * shop_multiply * durability_ratio);
+}
+
+s32 ARX_INTERACTIVE_GetSellPrice(Entity * io, Entity * shop) {
 	
 	if(!io || !(io->ioflags & IO_ITEM)) {
 		return 0;
@@ -159,7 +171,7 @@ s32 ARX_INTERACTIVE_GetPrice(Entity * io, Entity * shop) {
 
 s32 ARX_INTERACTIVE_GetSellValue(Entity * item, Entity * shop, long count) {
 	
-	float price = float(ARX_INTERACTIVE_GetPrice(item, shop) / 3 * count);
+	float price = float(ARX_INTERACTIVE_GetSellPrice(item, shop) / 3 * count);
 	
 	return s32(price + price * player.m_skillFull.intuition * 0.005f);
 }
