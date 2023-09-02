@@ -323,11 +323,49 @@ public:
 	
 	Result execute(Context & context) override {
 		
-		long price = std::max(long(context.getFloat()), 0l);
+		long buyPrice = std::max(long(context.getFloat()), 0l);
 		
-		DebugScript(' ' << price);
+		DebugScript(' ' << buyPrice);
 		
-		context.getEntity()->_itemdata->buyPrice = price;
+		context.getEntity()->_itemdata->buyPrice = buyPrice;
+		
+		return Success;
+	}
+	
+};
+
+class SetBuyPriceCommand : public Command {
+	
+public:
+	
+	SetBuyPriceCommand() : Command("setbuyprice", IO_ITEM) { }
+	
+	Result execute(Context & context) override {
+		
+		long buyPrice = std::max(long(context.getFloat()), 0l);
+		
+		DebugScript(' ' << buyPrice);
+		
+		context.getEntity()->_itemdata->buyPrice = buyPrice;
+		
+		return Success;
+	}
+	
+};
+
+class SetSellPriceCommand : public Command {
+	
+public:
+	
+	SetSellPriceCommand() : Command("setsellprice", IO_ITEM) { }
+	
+	Result execute(Context & context) override {
+		
+		long sellPrice = std::max(long(context.getFloat()), 0l);
+		
+		DebugScript(' ' << sellPrice);
+		
+		context.getEntity()->_itemdata->buyPrice = sellPrice;
 		
 		return Success;
 	}
@@ -400,6 +438,8 @@ void setupScriptedItem() {
 	ScriptEvent::registerCommand(std::make_unique<SetMaxCountCommand>());
 	ScriptEvent::registerCommand(std::make_unique<SetCountCommand>());
 	ScriptEvent::registerCommand(std::make_unique<SetPriceCommand>());
+	ScriptEvent::registerCommand(std::make_unique<SetBuyPriceCommand>());
+	ScriptEvent::registerCommand(std::make_unique<SetSellPriceCommand>());
 	ScriptEvent::registerCommand(std::make_unique<PlayerStackSizeCommand>());
 	ScriptEvent::registerCommand(std::make_unique<EatMeCommand>());
 	
