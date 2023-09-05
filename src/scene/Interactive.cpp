@@ -1564,10 +1564,13 @@ Entity * AddItem(const res::path & classPath_, EntityInstance instance, AddInter
 	io->_itemdata->food_value = 0;
 	io->_itemdata->LightValue = -1;
 
-	if(io->ioflags & IO_GOLD)
+	if(io->ioflags & IO_GOLD) {
 		io->_itemdata->buyPrice = 1;
-	else
+		io->_itemdata->sellPrice = 1;
+	} else {
 		io->_itemdata->buyPrice = 10;
+		io->_itemdata->sellPrice = 10;
+	}
 
 	io->_itemdata->playerstacksize = 1;
 

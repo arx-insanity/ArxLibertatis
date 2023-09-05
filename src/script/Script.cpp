@@ -993,7 +993,7 @@ ValueType getSystemVar(const script::Context & context, std::string_view name,
 			if(boost::starts_with(name, "^sellprice")) {
 				*fcontent = 0;
 				if(context.getEntity() && (context.getEntity()->ioflags & IO_ITEM)) {
-					*fcontent = static_cast<float>(context.getEntity()->_itemdata->buyPrice);
+					*fcontent = static_cast<float>(context.getEntity()->_itemdata->sellPrice);
 				}
 				return TYPE_FLOAT;
 			}

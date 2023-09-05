@@ -1390,6 +1390,7 @@ void ARX_DAMAGES_DurabilityRestore(Entity * io, float percent) {
 
 			if(io->ioflags & IO_ITEM) {
 				io->_itemdata->buyPrice -= util::to<long>(float(io->_itemdata->buyPrice) / io->max_durability);
+				io->_itemdata->sellPrice -= util::to<long>(float(io->_itemdata->sellPrice) / io->max_durability);
 			}
 
 			io->max_durability -= mloss;
@@ -1403,6 +1404,7 @@ void ARX_DAMAGES_DurabilityRestore(Entity * io, float percent) {
 			float mloss = io->max_durability * v;
 			if(io->ioflags & IO_ITEM) {
 				io->_itemdata->buyPrice -= static_cast<long>(float(io->_itemdata->buyPrice) * v);
+				io->_itemdata->sellPrice -= static_cast<long>(float(io->_itemdata->sellPrice) * v);
 			}
 
 			io->max_durability -= mloss;
