@@ -157,7 +157,8 @@ std::string_view GetMaterialString(const res::path & texture);
 Entity * CloneIOItem(Entity * src);
 
 float ARX_INTERACTIVE_GetArmorClass(Entity * io);
-s32 ARX_INTERACTIVE_GetPrice(Entity * io, Entity * shop);
+s32 ARX_INTERACTIVE_GetBuyPrice(Entity * io, Entity * shop);
+s32 ARX_INTERACTIVE_GetSellPrice(Entity * io, Entity * shop);
 s32 ARX_INTERACTIVE_GetSellValue(Entity * item, Entity * shop, long count = 1);
 
 struct TREATZONE_IO {
