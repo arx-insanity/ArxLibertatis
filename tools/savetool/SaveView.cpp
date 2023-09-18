@@ -1643,6 +1643,7 @@ static void print_io_item(const ARX_CHANGELEVEL_IO_SAVE & ais,
 	std::cout << "\nItem Data:\n";
 	
 	std::cout << "  Buy price: " << ai->buyPrice << '\n';
+	std::cout << "  Sell price: " << ai->sellPrice << '\n';
 	if(ai->count != 1 || ai->maxcount != 1) {
 		std::cout << "  Count: " << ai->count << " / " << ai->maxcount << '\n';
 	}
