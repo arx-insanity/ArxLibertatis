@@ -58,7 +58,7 @@ long IN_BOOK_DRAW = 0;
 PlayerBook g_playerBook;
 
 float g_bookScale = 1.0f;
-Rectf g_bookRect = Rectf(Vec2f(97, 64), 513, 313);
+Rectf g_bookRect = g_bookResouces.playerbook->m_rect;
 
 
 void PlayerBook::open() {
@@ -476,7 +476,7 @@ void PlayerBook::updateRect() {
 	
 	float scale = g_bookScale;
 	
-	const Rectf bookRectOrig = Rectf(Vec2f(97.f, 64.f), 513.f, 313.f);
+	const Rectf bookRectOrig = g_bookResouces.playerbook->m_rect;
 	
 	g_bookRect = Rectf(Vec2f(g_size.center()) - bookRectOrig.size() * scale / 2.f,
 	                   bookRectOrig.width() * scale,
@@ -564,7 +564,7 @@ void StatsPage::loadStrings() {
 
 void StatsPage::manage() {
 	
-	DrawBookInterfaceItem(g_bookResouces.playerbook, g_bookRect.topLeft(), Color::white, 0.9999f);
+	DrawBookInterfaceItem(g_bookResouces.playerbook->m_tc, g_bookRect.topLeft(), Color::white, 0.9999f);
 	
 	manageStats();
 }
@@ -574,7 +574,7 @@ void StatsPage::manageNewQuest() {
 	g_playerBook.update();
 
 	Vec2f bookPos = g_bookRect.topLeft();
-	DrawBookInterfaceItem(g_bookResouces.playerbook, bookPos, Color::white, 0.000001f);
+	DrawBookInterfaceItem(g_bookResouces.playerbook->m_tc, bookPos, Color::white, 0.000001f);
 	
 	manageStats();
 }

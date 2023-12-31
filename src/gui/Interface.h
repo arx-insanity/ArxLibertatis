@@ -65,12 +65,28 @@ class Entity;
 
 extern Entity * FlyingOverIO;
 
+class InterfaceElement {
+	public:
+		
+		InterfaceElement(Rectf rect, res::path tcFilename)
+			: m_tc(nullptr)
+			, m_rect(rect)
+			, m_tcFilename(tcFilename)
+		{}
+		
+		void loadTextureContainer();
+		
+		TextureContainer * m_tc;
+		Rectf m_rect;
+		res::path m_tcFilename;
+};
+
 class INTERFACE_TC {
 	
 public:
 	
 	INTERFACE_TC()
-		: playerbook(nullptr)
+		: playerbook(new InterfaceElement(Rectf(Vec2f(97, 64), 513, 313), "graph/interface/book/character_sheet/char_sheet_book"))
 		, ic_casting(nullptr)
 		, ic_close_combat(nullptr)
 		, ic_constitution(nullptr)
@@ -98,7 +114,7 @@ public:
 	
 	void init();
 	
-	TextureContainer * playerbook;
+	InterfaceElement * playerbook;
 	TextureContainer * ic_casting;
 	TextureContainer * ic_close_combat;
 	TextureContainer * ic_constitution;

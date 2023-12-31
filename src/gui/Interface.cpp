@@ -234,9 +234,14 @@ void ARX_INTERFACE_DrawNumber(const Vec2f & pos, const long num, const Color col
 	
 }
 
+void InterfaceElement::loadTextureContainer() {
+	this->m_tc = TextureContainer::LoadUI(this->m_tcFilename);
+	arx_assert(this->m_tc);
+}
+
 void INTERFACE_TC::init() {
 	
-	playerbook            = TextureContainer::LoadUI("graph/interface/book/character_sheet/char_sheet_book");
+	playerbook->loadTextureContainer();
 	ic_casting            = TextureContainer::LoadUI("graph/interface/book/character_sheet/buttons_carac/icone_casting");
 	ic_close_combat       = TextureContainer::LoadUI("graph/interface/book/character_sheet/buttons_carac/icone_close_combat");
 	ic_constitution       = TextureContainer::LoadUI("graph/interface/book/character_sheet/buttons_carac/icone_constit");
@@ -279,8 +284,6 @@ void INTERFACE_TC::init() {
 	currentTab[8]   = TextureContainer::LoadUI("graph/interface/book/current_page/current_9");
 	currentTab[9]   = TextureContainer::LoadUI("graph/interface/book/current_page/current_10");
 	
-	
-	arx_assert(playerbook);
 	arx_assert(ic_casting);
 	arx_assert(ic_close_combat);
 	arx_assert(ic_constitution);
@@ -324,7 +327,6 @@ void INTERFACE_TC::init() {
 	arx_assert(currentTab[9]);
 	
 }
-
 
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_HALO_Render(Color3f color, long _lHaloType, TextureContainer * haloTexture,
@@ -1695,10 +1697,10 @@ void ArxGame::manageEditorControls() {
 	
 	if(player.Interface & INTER_PLAYERBOOK) {
 		
-		Vec2f pos(97 * g_sizeRatio.x, 64 * g_sizeRatio.y);
+		Vec2f pos(g_bookResouces.playerbook->m_rect.left * g_sizeRatio.x, g_bookResouces.playerbook->m_rect.top * g_sizeRatio.y);
 		
-		TextureContainer * playerbook = g_bookResouces.playerbook;
-		arx_assert(g_bookResouces.playerbook);
+		TextureContainer * playerbook = g_bookResouces.playerbook->m_tc;
+		arx_assert(g_bookResouces.playerbook->m_tc);
 		
 		const Rect mouseTestRect(s32(pos.x), s32(pos.y),
 		                         s32(pos.x + playerbook->m_size.x * g_sizeRatio.x),
