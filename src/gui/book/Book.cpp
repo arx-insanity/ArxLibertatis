@@ -82,6 +82,16 @@ static bool MouseInBookRect(const Vec2f pos, const Vec2f size) {
 	return rect.contains(Vec2f(DANAEMouse));
 }
 
+// [Added by: Capalin]
+static bool MouseInBookRect(const Vec2f pos, const Vec2f size, float oSizeX, float oSizeY) {
+	float ratioX = oSizeX / size.x;
+	float ratioY = oSizeY / size.y;
+
+	Rectf rect = Rectf(pos, size.x * g_bookScale * ratioX, size.y * g_bookScale * ratioY);
+
+	return rect.contains(Vec2f(DANAEMouse));
+}
+
 bool ARX_INTERFACE_MouseInBook() {
 	if((player.Interface & INTER_PLAYERBOOK) && !(player.Interface & INTER_COMBATMODE)) {
 		return MouseInBookRect(g_bookRect.topLeft() + Vec2f(2, 1) * g_bookScale, Vec2f(500, 307) * g_bookScale);
@@ -89,10 +99,20 @@ bool ARX_INTERFACE_MouseInBook() {
 	return false;
 }
 
-
 static void DrawBookInterfaceItem(TextureContainer * tc, Vec2f pos, Color color, float z) {
 	arx_assert(tc);
 	Rectf rect = Rectf(pos, float(tc->m_size.x) * g_bookScale, float(tc->m_size.y) * g_bookScale);
+	EERIEDrawBitmap(rect, z, tc, color);
+}
+
+// [Added by: Capalin]
+// [Info] Reference resolution: 760x515 for book icons (size 32x32px)
+static void DrawBookInterfaceItem(TextureContainer * tc, Vec2f pos, Color color, float z, float oSizeX, float oSizeY) {
+	float ratioX = oSizeX / tc->m_size.x;
+	float ratioY = oSizeY / tc->m_size.y;
+
+	arx_assert(tc);
+	Rectf rect = Rectf(pos, float(tc->m_size.x) * g_bookScale * ratioX, float(tc->m_size.y) * g_bookScale * ratioY);
 	EERIEDrawBitmap(rect, z, tc, color);
 }
 
@@ -121,13 +141,13 @@ void PlayerBook::clearJournal() {
 void PlayerBookPage::drawTab(long tabNum) {
 	Vec2f bookPos = g_bookRect.topLeft();
 	float scale = g_bookScale;
-	DrawBookInterfaceItem(g_bookResouces.accessibleTab[tabNum], bookPos + m_tabOffsets[tabNum] * scale, Color::white, 0.000001f);
+	DrawBookInterfaceItem(g_bookResouces.accessibleTab[tabNum], bookPos + m_tabOffsets[tabNum] * scale, Color::white, 0.000001f, 32.f, 32.f);
 }
 
 void PlayerBookPage::drawActiveTab(long tabNum) {
 	Vec2f bookPos = g_bookRect.topLeft();
 	float scale = g_bookScale;
-	DrawBookInterfaceItem(g_bookResouces.currentTab[tabNum], bookPos + m_activeTabOffsets[tabNum] * scale, Color::white, 0.000001f);
+	DrawBookInterfaceItem(g_bookResouces.currentTab[tabNum], bookPos + m_activeTabOffsets[tabNum] * scale, Color::white, 0.000001f, 32.f, 32.f);
 }
 
 void PlayerBookPage::checkTabClick(long tabNum, long & activeTab) {
@@ -137,8 +157,7 @@ void PlayerBookPage::checkTabClick(long tabNum, long & activeTab) {
 
 	if(MouseInBookRect(bookPos + m_tabOffsets[tabNum] * scale, Vec2f(32, 32) * scale)) {
 		UseRenderState state(render2D().blendAdditive());
-		DrawBookInterfaceItem(g_bookResouces.accessibleTab[tabNum], bookPos + m_tabOffsets[tabNum] * scale,
-		                      Color::gray(1.f / 3), 0.000001f);
+		DrawBookInterfaceItem(g_bookResouces.accessibleTab[tabNum], bookPos + m_tabOffsets[tabNum] * scale, Color::gray(1.f / 3), 0.000001f, 32.f, 32.f);
 		cursorSetInteraction();
 		if(eeMouseDown1() || eeMouseDown2()) {
 			ARX_SOUND_PlayInterface(g_snd.BOOK_PAGE_TURN, Random::getf(0.9f, 1.1f));
@@ -347,14 +366,14 @@ void PlayerBook::manageTopTabs() {
 		Vec2f pos = BOOKMARKS_POS;
 		
 		TextureContainer * tcBookmarkChar = g_bookResouces.bookmark_char;
-		DrawBookInterfaceItem(tcBookmarkChar, pos, Color::white, 0.000001f);
+		DrawBookInterfaceItem(tcBookmarkChar, pos, Color::white, 0.000001f, 32.f, 32.f);
 		
 		// Check for cursor on character sheet bookmark
-		if(MouseInBookRect(pos, Vec2f(tcBookmarkChar->m_size) * scale)) {
+		if(MouseInBookRect(pos, Vec2f(tcBookmarkChar->m_size) * scale, 32.f, 32.f)) {
 			
 			// Draw highlighted Character sheet icon
 			UseRenderState state(render2D().blendAdditive());
-			DrawBookInterfaceItem(tcBookmarkChar, pos, Color::gray(1.f / 3), 0.000001f);
+			DrawBookInterfaceItem(tcBookmarkChar, pos, Color::gray(1.f / 3), 0.000001f, 32.f, 32.f);
 			
 			// Set cursor to interacting
 			cursorSetInteraction();
@@ -372,7 +391,7 @@ void PlayerBook::manageTopTabs() {
 		if(player.rune_flags) {
 			Vec2f pos = BOOKMARKS_POS + Vec2f(32, 0) * scale;
 			
-			DrawBookInterfaceItem(g_bookResouces.bookmark_magic, pos, Color::white, 0.000001f);
+			DrawBookInterfaceItem(g_bookResouces.bookmark_magic, pos, Color::white, 0.000001f, 32.f, 32.f);
 
 			if(NewSpell == 1) {
 				NewSpell = 2;
@@ -382,11 +401,10 @@ void PlayerBook::manageTopTabs() {
 				}
 			}
 			
-			if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_magic->m_size) * scale)) {
-				
+			if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_magic->m_size) * scale, 32.f, 32.f)) {
 				// Draw highlighted Magic sheet icon
 				UseRenderState state(render2D().blendAdditive());
-				DrawBookInterfaceItem(g_bookResouces.bookmark_magic, pos, Color::gray(1.f / 3), 0.000001f);
+				DrawBookInterfaceItem(g_bookResouces.bookmark_magic, pos, Color::gray(1.f / 3), 0.000001f, 32.f, 32.f);
 				
 				// Set cursor to interacting
 				cursorSetInteraction();
@@ -403,12 +421,12 @@ void PlayerBook::manageTopTabs() {
 	if(m_currentPage != BOOKMODE_MINIMAP) {
 		Vec2f pos = BOOKMARKS_POS + Vec2f(64, 0) * scale;
 		
-		DrawBookInterfaceItem(g_bookResouces.bookmark_map, pos, Color::white, 0.000001f);
+		DrawBookInterfaceItem(g_bookResouces.bookmark_map, pos, Color::white, 0.000001f, 32.f, 32.f);
 		
-		if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_map->m_size) * scale)) {
+		if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_map->m_size) * scale, 32.f, 32.f)) {
 			
 			UseRenderState state(render2D().blendAdditive());
-			DrawBookInterfaceItem(g_bookResouces.bookmark_map, pos, Color::gray(1.f / 3), 0.000001f);
+			DrawBookInterfaceItem(g_bookResouces.bookmark_map, pos, Color::gray(1.f / 3), 0.000001f, 32.f, 32.f);
 			
 			// Set cursor to interacting
 			cursorSetInteraction();
@@ -424,12 +442,12 @@ void PlayerBook::manageTopTabs() {
 	if(m_currentPage != BOOKMODE_QUESTS) {
 		Vec2f pos = BOOKMARKS_POS + Vec2f(96, 0) * scale;
 		
-		DrawBookInterfaceItem(g_bookResouces.bookmark_quest, pos, Color::white, 0.000001f);
+		DrawBookInterfaceItem(g_bookResouces.bookmark_quest, pos, Color::white, 0.000001f, 32.f, 32.f);
 		
-		if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_quest->m_size) * scale)) {
+		if(MouseInBookRect(pos, Vec2f(g_bookResouces.bookmark_quest->m_size) * scale, 32.f, 32.f)) {
 			
 			UseRenderState state(render2D().blendAdditive());
-			DrawBookInterfaceItem(g_bookResouces.bookmark_quest, pos, Color::gray(1.f / 3), 0.000001f);
+			DrawBookInterfaceItem(g_bookResouces.bookmark_quest, pos, Color::gray(1.f / 3), 0.000001f, 32.f, 32.f);
 			
 			// Set cursor to interacting
 			cursorSetInteraction();
@@ -564,7 +582,7 @@ void StatsPage::loadStrings() {
 
 void StatsPage::manage() {
 	
-	DrawBookInterfaceItem(g_bookResouces.playerbook, g_bookRect.topLeft(), Color::white, 0.9999f);
+	DrawBookInterfaceItem(g_bookResouces.playerbook, g_bookRect.topLeft(), Color::white, 0.9999f, 513.f, 313.f);
 	
 	manageStats();
 }
@@ -574,7 +592,7 @@ void StatsPage::manageNewQuest() {
 	g_playerBook.update();
 
 	Vec2f bookPos = g_bookRect.topLeft();
-	DrawBookInterfaceItem(g_bookResouces.playerbook, bookPos, Color::white, 0.000001f);
+	DrawBookInterfaceItem(g_bookResouces.playerbook, bookPos, Color::white, 0.000001f, 513.f, 313.f);
 	
 	manageStats();
 }
@@ -1346,7 +1364,7 @@ SpellsPage::SpellsPage()
 
 void SpellsPage::manage() {
 	
-	DrawBookInterfaceItem(g_bookResouces.ptexspellbook, g_bookRect.topLeft(), Color::white, 0.9999f);
+	DrawBookInterfaceItem(g_bookResouces.ptexspellbook, g_bookRect.topLeft(), Color::white, 0.9999f, 513.f, 313.f);
 	drawLeftTabs();
 	
 	float scale = g_bookScale;
@@ -1408,7 +1426,7 @@ void SpellsPage::drawSpells() const {
 			Vec2f pos = bookPos + Vec2f(143.f - float(count) * 16.f, 242.f) * scale;
 			for(Rune rune : spellInfo.symbols) {
 				if(rune != RUNE_NONE) {
-					DrawBookInterfaceItem(gui::necklace.pTexTab[rune], pos, Color::white, 0.000001f);
+					DrawBookInterfaceItem(gui::necklace.pTexTab[rune], pos, Color::white, 0.000001f, 32.f, 32.f);
 					pos.x += 32.f * scale;
 				}
 			}
@@ -1437,7 +1455,7 @@ void SpellsPage::drawSpells() const {
 				color = Color(168, 208, 223);
 			}
 			
-			DrawBookInterfaceItem(spellInfo.tc, fPos, color, 0.000001f);
+			DrawBookInterfaceItem(spellInfo.tc, fPos, color, 0.000001f, 48.f, 48.f);
 			
 		}
 		
@@ -1457,7 +1475,7 @@ MapPage::MapPage()
 }
 
 void MapPage::manage() {
-	DrawBookInterfaceItem(g_bookResouces.questbook, g_bookRect.topLeft(), Color::white, 0.9999f);
+	DrawBookInterfaceItem(g_bookResouces.questbook, g_bookRect.topLeft(), Color::white, 0.9999f, 513.f, 313.f);
 	drawLeftTabs();
 	drawMaps();
 }
