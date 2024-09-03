@@ -26,6 +26,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdlib>
+#include <iostream>
+#include <utility>
 
 #include "platform/Platform.h"
 
@@ -35,6 +37,8 @@
 #endif
 
 #include <boost/version.hpp>
+#include <boost/asio.hpp>
+#include <boost/bind/bind.hpp>
 
 #include <glm/glm.hpp>
 
@@ -58,6 +62,7 @@
 
 #include "platform/Compiler.h"
 #include "platform/CrashHandler.h"
+#include "platform/ProgramOptions.h"
 #include "platform/profiler/Profiler.h"
 #include "platform/Thread.h"
 #include "platform/Time.h"
@@ -76,6 +81,19 @@
 #else
 	#undef main /* in case SDL.h was already included */
 #endif
+
+void startClient(const std::string & ipAndPort)
+{
+	std::cout << "---> client, connecting to: " << ipAndPort << std::endl;
+}
+
+void startServer()
+{
+	std::cout << "---> server" << std::endl;
+}
+
+ARX_PROGRAM_OPTION_ARG("client", "", "Start the game as a client", &startClient, "IPANDPORT")
+ARX_PROGRAM_OPTION("server", "", "Start the game as a server", &startServer)
 
 int utf8_main(int argc, char ** argv) {
 	
@@ -162,8 +180,11 @@ int utf8_main(int argc, char ** argv) {
 		
 		// 14: Start the game already!
 		LogInfo << "Starting " << arx_name << ' ' << arx_version;
-		runGame();
+		// runGame();
 		
+		// -----------------------------------
+
+		// TODO: https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/tutorial.html
 	}
 	
 	benchmark::shutdown();
