@@ -113,45 +113,96 @@ void Note::calculateLayout() {
 	Vec2f nextButtonOffset(0.f);
 	
 	Vec2f scale = Vec2f(g_playerBook.getScale());
+
+	// [Added by: Capalin]
+	float ratioX;
+	float ratioY;
 	
-	float noteY = 0.0f;
-	if(m_type != QuestBook) {
-		noteY = (float(m_background->m_size.y) * minSizeRatio() / 2.f + 47.f * minSizeRatio())
-		        - float(m_background->m_size.y) * scale.y / 2.0f;
-	}
+	// [Modified by: Lali]
+	// float noteY = 0.0f;
+	float noteY;
+	// [Removed by: Lali]
+	// if(m_type != QuestBook) {
+	// 	noteY = (float(m_background->m_size.y) * minSizeRatio() / 2.f + 47.f * minSizeRatio())
+	// 	        - float(m_background->m_size.y) * scale.y / 2.0f;
+	// }
 	
 	switch(m_type) {
 		
 		// TODO this information should not be hardcoded
 		
 		case Notice: {
-			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			// [Added by: Capalin]
+			ratioX = 283.f / m_background->m_size.x;
+			ratioY = 315.f / m_background->m_size.y;
+			
+			// [Added by: Lali]
+			noteY = (m_background->m_size.y * ratioY * minSizeRatio() / 2.f + 47.f * minSizeRatio()) - m_background->m_size.y * ratioY * scale.y / 2.0f;
+			
+			// [Modified by: Capalin]
+			// newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * ratioX * 0.5f * scale.x, noteY);
 			newTextStart = Vec2f(50.f, 50.f);
-			newTextEnd = Vec2f(m_background->size()) - Vec2f(50.f, 50.f);
+			// [Modified by: Capalin]
+			//newTextEnd = Vec2f(m_background->size()) - Vec2f(50.f, 50.f);
+			newTextEnd = Vec2f(m_background->size().x * ratioX, m_background->size().y * ratioY) - Vec2f(50.f, 50.f);
 			m_maxPages = 1;
 			break;
 		}
 		
 		case SmallNote: {
-			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			// [Added by: Capalin]
+			ratioX = 315.f / m_background->m_size.x;
+			ratioY = 283.f / m_background->m_size.y;
+			
+			// [Added by: Lali]
+			noteY = (m_background->m_size.y * ratioY * minSizeRatio() / 2.f + 47.f * minSizeRatio()) - m_background->m_size.y * ratioY * scale.y / 2.0f;
+			
+			// [Modified by: Capalin]
+			// newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * ratioX * 0.5f * scale.x, noteY);
 			newTextStart = Vec2f(30.f, 30.f);
-			newTextEnd = Vec2f(m_background->size()) - Vec2f(30.f, 40.f);
+			// [Modified by: Capalin]
+			//newTextEnd = Vec2f(m_background->size()) - Vec2f(30.f, 40.f);
+			newTextEnd = Vec2f(m_background->size().x * ratioX, m_background->size().y * ratioY) - Vec2f(30.f, 40.f);
 			m_maxPages = 1;
 			break;
 		}
 		
 		case BigNote: {
-			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			// [Added by: Capalin]
+			ratioX = 512.f / m_background->m_size.x;
+			ratioY = 313.f / m_background->m_size.y;
+			
+			// [Added by: Lali]
+			noteY = (m_background->m_size.y * ratioY * minSizeRatio() / 2.f + 47.f * minSizeRatio()) - m_background->m_size.y * ratioY * scale.y / 2.0f;
+			
+			// [Modified by: Capalin]
+			// newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * ratioX * 0.5f * scale.x, noteY);
 			newTextStart = Vec2f(40.f, 40.f);
-			newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
+			// [Modified by: Capalin]
+			//newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
+			newTextEnd = Vec2f(m_background->size().x * ratioX, m_background->size().y * ratioY) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
 			m_maxPages = 2;
 			break;
 		}
 		
 		case Book: {
-			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			// [Added by: Capalin]
+			ratioX = 513.f / m_background->m_size.x;
+			ratioY = 313.f / m_background->m_size.y;
+			
+			// [Added by: Lali]
+			noteY = (m_background->m_size.y * ratioY * minSizeRatio() / 2.f + 47.f * minSizeRatio()) - m_background->m_size.y * ratioY * scale.y / 2.0f;
+			
+			// [Modified by: Capalin]
+			// newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * 0.5f * scale.x, noteY);
+			newPos = Vec2f(320 * g_sizeRatio.x - m_background->m_size.x * ratioX * 0.5f * scale.x, noteY);
 			newTextStart = Vec2f(40.f, 20.f);
-			newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
+			// [Modified by: Capalin]
+			//newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
+			newTextEnd = Vec2f(m_background->size().x * ratioX, m_background->size().y * ratioY) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 40.f);
 			m_maxPages = std::numeric_limits<size_t>::max();
 			prevButtonOffset = Vec2f(8.f, -6.f);
 			nextButtonOffset = Vec2f(-15.f, -6.f);
@@ -159,9 +210,15 @@ void Note::calculateLayout() {
 		}
 		
 		case QuestBook: {
+			// [Added by: Capalin]
+			ratioX = 513.f / m_background->m_size.x;
+			ratioY = 313.f / m_background->m_size.y;
+
 			newPos = g_playerBook.getArea().topLeft();
 			newTextStart = Vec2f(40.f, 30.f);
-			newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 45.f);
+			// [Modified by: Capalin]
+			//newTextEnd = Vec2f(m_background->size()) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 45.f);
+			newTextEnd = Vec2f(m_background->size().x * ratioX, m_background->size().y * ratioY) * Vec2f(0.5f, 1.f) - Vec2f(10.f, 45.f);
 			m_maxPages = std::numeric_limits<size_t>::max();
 			prevButtonOffset = Vec2f(8.f, -6.f);
 			nextButtonOffset = Vec2f(-15.f, -6.f);
@@ -174,19 +231,37 @@ void Note::calculateLayout() {
 	if(m_type == QuestBook) {
 		m_area = g_playerBook.getArea();
 	} else {
-		m_area = Rectf(newPos, float(m_background->m_size.x) * scale.x, float(m_background->m_size.y) * scale.y);
+		// [Modified by: Capalin]
+		// m_area = Rectf(newPos, float(m_background->m_size.x) * scale.x, float(m_background->m_size.y) * scale.y);
+		m_area = Rectf(newPos, float(m_background->m_size.x) * ratioX * scale.x, float(m_background->m_size.y) * ratioY * scale.y);
 	}
 	m_textArea = Rect(Vec2i(newTextStart * scale), Vec2i(newTextEnd * scale));
 	m_pageSpacing = s32(20 * scale.x);
 	if(m_prevPage) {
-		Vec2f pos = Vec2f(0.f, m_background->m_size.y - m_prevPage->m_size.y) + prevButtonOffset;
+		// [Added by: Capalin]
+		float pageCornerRatioX = 64.f / m_prevPage->m_size.x;
+		float pageCornerRatioY = 64.f / m_prevPage->m_size.y;
+
+		// [Modified by: Capalin]
+		//Vec2f pos = Vec2f(0.f, m_background->m_size.y - m_prevPage->m_size.y) + prevButtonOffset;
+		Vec2f pos = Vec2f(0.f, m_background->m_size.y * ratioY - m_prevPage->m_size.y * pageCornerRatioY) + prevButtonOffset;
 		pos *= scale;
-		m_prevPageButton = Rectf(newPos + pos, m_prevPage->m_size.x * scale.x, m_prevPage->m_size.y * scale.y);
+		// [Modified by: Capalin]
+		//m_prevPageButton = Rectf(newPos + pos, m_prevPage->m_size.x * scale.x, m_prevPage->m_size.y * scale.y);
+		m_prevPageButton = Rectf(newPos + pos, m_prevPage->m_size.x * pageCornerRatioX * scale.x, m_prevPage->m_size.y * pageCornerRatioY * scale.y);
 	}
 	if(m_nextPage) {
-		Vec2f pos = Vec2f(m_background->size() - m_nextPage->size()) + nextButtonOffset;
+		// [Added by: Capalin]
+		float pageCornerRatioX = 64.f / m_nextPage->m_size.x;
+		float pageCornerRatioY = 64.f / m_nextPage->m_size.y;
+
+		// [Modified by: Capalin]
+		//Vec2f pos = Vec2f(m_background->size() - m_nextPage->size()) + nextButtonOffset;
+		Vec2f pos = Vec2f(m_background->size().x * ratioX - m_nextPage->size().x * pageCornerRatioX, m_background->size().y * ratioY - m_nextPage->size().y * pageCornerRatioY) + nextButtonOffset;
 		pos *= scale;
-		m_nextPageButton = Rectf(newPos + pos, m_nextPage->m_size.x * scale.x, m_nextPage->m_size.y * scale.y);
+		// [Modified by: Capalin]
+		//m_nextPageButton = Rectf(newPos + pos, m_nextPage->m_size.x * scale.x, m_nextPage->m_size.y * scale.y);
+		m_nextPageButton = Rectf(newPos + pos, m_nextPage->m_size.x * pageCornerRatioX * scale.x, m_nextPage->m_size.y * pageCornerRatioY * scale.y);
 	}
 }
 
